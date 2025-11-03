@@ -58,7 +58,6 @@ class Net:
 class Netlist:
     source: Path
     # Map component's ref to component.
-    # TODO: ensure refs are unique
     components: Dict[ComponentRef, Component]
     nets: Set[Net]
 
@@ -137,6 +136,19 @@ def group_components_by_snippet(
     reverse_lookup = SnippetsReverseLookup(dict())
     for component in netlist.components.values():
         if SNIPPET_TYPE_FIELD_NAME not in component.fields:
+            false_friend_fields = [
+                field
+                for field in component.fields.keys()
+                if field.startswith(SNIPPET_PIN_FIELD_PREFIX)
+                or field.startswith(SNIPPET_MAP_FIELD_PREFIX)
+            ]
+            if len(false_friend_fields) != 0:
+                print(
+                    f"Warning: The component {component.ref} defines the {'fields' if len(false_friend_fields) > 1 else 'field'} {', '.join(false_friend_fields)} but not the field {SNIPPET_TYPE_FIELD_NAME}.\n"
+                    "Therefore, it is not part of a snippet.",
+                    file=sys.stderr,
+                )
+
             # This component is not part of any snippet.
             continue
         snippet_type = SnippetType(component.fields[SNIPPET_TYPE_FIELD_NAME])
@@ -158,7 +170,7 @@ def group_components_by_snippet(
             snippet_map_field_name = field_name[len(SNIPPET_MAP_FIELD_PREFIX) :]
             if snippet_map_field_name in snippets[snippet_name].snippet_map_fields:
                 print(
-                    f"The snippet {snippet_name} contains the SnippetMapField {snippet_map_field_name} twice.\n"
+                    f"Error: The snippet {snippet_name} contains the SnippetMapField {snippet_map_field_name} twice.\n"
                     f"They have the values {field_value} and {snippets[snippet_name].snippet_map_fields[snippet_map_field_name]}.\n"
                     f"One is in component {component.ref}.",
                     file=sys.stderr,
@@ -202,7 +214,7 @@ def get_explicit_pin_name_lookups(
                 snippet_pin_name = SnippetPinName(field_value)
                 if snippet_pin_name in snippet_pin_names:
                     print(
-                        f"The SnippetPin {snippet_pin_name} exists twice for the snippet {snippet_name}.",
+                        f"Error: The SnippetPin {snippet_pin_name} exists twice for the snippet {snippet_name}.",
                         file=sys.stderr,
                     )
                     sys.exit(1)
@@ -271,7 +283,7 @@ def convert_netlist(
                 != node.ref
             ):
                 print(
-                    f"the pin {snippet_pin_name} in the snippet {snippet_name} occurs in multiple components: {global_snippet_pin_to_component[global_snippet_pin_identifier]} and {node.ref}.",
+                    f"Error: The pin {snippet_pin_name} in the snippet {snippet_name} occurs in multiple components: {global_snippet_pin_to_component[global_snippet_pin_identifier]} and {node.ref}.",
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -296,8 +308,16 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
     snippet_map.tool = TOOL_NAME
 
     if root_snippet_name not in raw_snippets_lookup:
+        all_snippet_names = ", ".join([
+            snippet.name for snippet in raw_snippets_lookup.values()
+        ])
+        all_snippet_print = (
+            f"There are no snippets. Define them by specifying at least one component with the {SNIPPET_TYPE_FIELD_NAME} field."
+            if len(all_snippet_names) == 0
+            else f"These snippets exist: {all_snippet_names}"
+        )
         print(
-            f"Didn't find a root snippet with name {root_snippet_name}.",
+            f"Error: Didn't find a root snippet with name {root_snippet_name}.\n{all_snippet_print}",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -323,7 +343,7 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
             if snippet_name == root_snippet_name:
                 if root_snippet_pin_name is not None:
                     print(
-                        f"Warning: Two pins of the root snippet {root_snippet_name}, {snippet_pin_name} and {root_snippet_pin_name} are connected together.\n"
+                        f"Warning: At least two pins of the root snippet {root_snippet_name}, {snippet_pin_name} and {root_snippet_pin_name} are connected together.\n"
                         "The entire net these pins are connected to will not be part of the snippet map",
                         file=sys.stderr,
                     )
@@ -335,6 +355,8 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
             # Does this pin belong to the root snippet?
             if snippet_name == root_snippet_name:
                 # We've already figured out what root pin this net is connected to.
+                # All we have to do is make sure the root snippet has this pin, too.
+                snippets_lookup[snippet_name].pins[snippet_pin_name] = None
                 continue
             assert snippet_pin_name not in snippets_lookup[snippet_name].pins
             # Because we only do this when this isn't a root snippet, all pins of the root snippet are connected to None.
@@ -426,15 +448,16 @@ def parse_netlist(netlist_path: Path) -> Netlist:
 
 
 def stringify_snippet_map(snippet_map: SnippetMap) -> str:
-    print(snippet_map.root_snippet)
+    # for pin in snippet_map.root_snippet.pins:
+    #     print(pin)
     # TODO
-    pass
+    sys.exit()
 
 
 def main() -> None:
     if len(sys.argv) != 3:
         print(
-            "Provide two arguments: the input file path and the root snippet name",
+            "Error: Provide two arguments: the input file path and the root snippet name",
             file=sys.stderr,
         )
         sys.exit(1)
