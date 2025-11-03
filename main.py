@@ -72,12 +72,6 @@ class SnippetMap:
     snippets: Set[Snippet]
 
 
-def parse_netlist(netlist_path: Path) -> Netlist:
-    tree = ET.parse(netlist_path)
-    root = tree.getroot()
-    print(root)
-
-
 class RawSnippet:
     name: SnippetName
     type_name: SnippetType
@@ -92,6 +86,11 @@ SnippetsLookup = NewType("SnippetsLookup", Dict[SnippetName, RawSnippet])
 # mapping from component ref to snippet name
 SnippetsReverseLookup = NewType(
     "SnippetsReverseLookup", Dict[ComponentRef, SnippetName]
+)
+# For each snippet this resolves the pins global identifier to the explicitly chosen pin name.
+SnippetPinNameLookups = NewType(
+    "SnippetPinNameLookups",
+    Dict[SnippetName, Dict[GlobalPinIdentifier, SnippetPinName]],
 )
 
 
@@ -136,13 +135,6 @@ One is in component {component.ref}.""",
         reverse_lookup[component.ref] = snippet_name
 
     return (snippets, reverse_lookup)
-
-
-# For each snippet this resolves the pins global identifier to the explicitly chosen pin name.
-SnippetPinNameLookups = NewType(
-    "SnippetPinNameLookups",
-    Dict[SnippetName, Dict[GlobalPinIdentifier, SnippetPinName]],
-)
 
 
 # Snippets without a explicit naming don't appear in this dict.
@@ -311,6 +303,12 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
     snippet_map.root_snippet = snippets_lookup[root_snippet_name]
 
     return snippet_map
+
+
+def parse_netlist(netlist_path: Path) -> Netlist:
+    tree = ET.parse(netlist_path)
+    root = tree.getroot()
+    print(root)
 
 
 def stringify_snippet_map(snippet_map: SnippetMap) -> str:
