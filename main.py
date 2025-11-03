@@ -311,6 +311,7 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
         snippet.name = raw_snippet.name
         snippet.type_name = raw_snippet.type_name
         snippet.snippet_map_fields = raw_snippet.snippet_map_fields
+        snippet.pins = dict()
         snippets_lookup[snippet.name] = snippet
 
     # Figure out what snippets are connected how.
