@@ -169,6 +169,11 @@ def group_components_by_snippet(
                 # This is not a SnippetMapField.
                 continue
             snippet_map_field_name = field_name[len(SNIPPET_MAP_FIELD_PREFIX) :]
+            if len(snippet_map_field_name) == 0:
+                print(
+                    f"Warning: The snippet {snippet_name} contains a SnippetMapField with the empty string as key.",
+                    file=sys.stderr,
+                )
             if snippet_map_field_name in snippets[snippet_name].snippet_map_fields:
                 print(
                     f"Error: The snippet {snippet_name} contains the SnippetMapField {snippet_map_field_name} twice.\n"
@@ -215,7 +220,7 @@ def get_explicit_pin_name_lookups(
                 snippet_pin_name = SnippetPinName(field_value)
                 if snippet_pin_name in snippet_pin_names:
                     print(
-                        f"Error: The SnippetPin {snippet_pin_name} exists twice for the snippet {snippet_name}.",
+                        f"Error: The SnippetPin {snippet_pin_name} exists at least twice for the snippet {snippet_name}.",
                         file=sys.stderr,
                     )
                     sys.exit(1)
