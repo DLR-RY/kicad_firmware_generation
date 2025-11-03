@@ -158,9 +158,9 @@ def group_components_by_snippet(
             snippet_map_field_name = field_name[len(SNIPPET_MAP_FIELD_PREFIX) :]
             if snippet_map_field_name in snippets[snippet_name].snippet_map_fields:
                 print(
-                    f"""The snippet {snippet_name} contains the SnippetMapField {snippet_map_field_name} twice.
-They have the values {field_value} and {snippets[snippet_name].snippet_map_fields[snippet_map_field_name]}.
-One is in component {component.ref}.""",
+                    f"The snippet {snippet_name} contains the SnippetMapField {snippet_map_field_name} twice.\n"
+                    f"They have the values {field_value} and {snippets[snippet_name].snippet_map_fields[snippet_map_field_name]}.\n"
+                    f"One is in component {component.ref}.",
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -320,21 +320,24 @@ def gen_snippet_map(netlist: Netlist, root_snippet_name: SnippetName) -> Snippet
         for snippet_name, snippet_pin_name in net:
             # Does this pin belong to the root snippet?
             if snippet_name == root_snippet_name:
-                # TODO: This doesn't hold for pluto...
                 if root_snippet_pin_name is not None:
                     print(
-                        f"Two pins of the root snippet {root_snippet_name}, {snippet_pin_name} and {root_snippet_pin_name} are connected together.",
+                        f"Warning: Two pins of the root snippet {root_snippet_name}, {snippet_pin_name} and {root_snippet_pin_name} are connected together.\n"
+                        "The entire net these pins are connected to will not be part of the snippet map",
                         file=sys.stderr,
                     )
-                    # TODO:
-                    sys.exit(1)
+                    root_snippet_pin_name = None
+                    break
                 root_snippet_pin_name = snippet_pin_name
-            else:
-                assert snippet_pin_name not in snippets_lookup[snippet_name].pins
-                # Because we only do this when this isn't a root snippet, all pins of the root snippet are connected to None.
-                snippets_lookup[snippet_name].pins[snippet_pin_name] = (
-                    root_snippet_pin_name
-                )
+
+        for snippet_name, snippet_pin_name in net:
+            # Does this pin belong to the root snippet?
+            if snippet_name == root_snippet_name:
+                # We've already figured out what root pin this net is connected to.
+                continue
+            assert snippet_pin_name not in snippets_lookup[snippet_name].pins
+            # Because we only do this when this isn't a root snippet, all pins of the root snippet are connected to None.
+            snippets_lookup[snippet_name].pins[snippet_pin_name] = root_snippet_pin_name
 
     snippet_map.snippets = {
         snippet
