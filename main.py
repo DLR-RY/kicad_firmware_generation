@@ -458,9 +458,12 @@ def stringify_snippet(snippet: Snippet, tag_name: str) -> ET.Element:
         snippet_map_field.set("name", key)
         snippet_map_field.text = value
 
-    pins = ET.SubElement(root, "pins")
-    for name, root_snippet_pin in snippet.pins.items():
-        pin = ET.SubElement(pins, "pin")
+    xml_pins = ET.SubElement(root, "pins")
+    # Ensure xml is deterministic.
+    pins = list(snippet.pins.items())
+    pins.sort(key=lambda item: item[0])
+    for name, root_snippet_pin in pins:
+        pin = ET.SubElement(xml_pins, "pin")
         pin.set("name", name)
         if root_snippet_pin is not None:
             pin.set("rootSnippetPin", root_snippet_pin)
@@ -481,10 +484,13 @@ def stringify_snippet_map(snippet_map: SnippetMap) -> ET.Element:
     root_snippet = stringify_snippet(snippet_map.root_snippet, "rootSnippet")
     root.append(root_snippet)
 
-    snippets = ET.SubElement(root, "snippet")
-    for snippet in snippet_map.snippets:
+    xml_snippets = ET.SubElement(root, "snippet")
+    # Ensure xml is deterministic.
+    snippets = list(snippet_map.snippets)
+    snippets.sort(key=lambda s: s.name)
+    for snippet in snippets:
         xml_snippet = stringify_snippet(snippet, "snippet")
-        snippets.append(xml_snippet)
+        xml_snippets.append(xml_snippet)
 
     ET.indent(root, space="    ", level=0)
     return root
