@@ -4,5 +4,6 @@ Parse KiCad [intermediate XML netlist format](https://docs.kicad.org/9.0/en/eesc
 
 Create the netlist like this:
 ```bash
-kicad-cli sch export netlist --format kicadxml ICA_EPS_Distribution.kicad_sch
+kicad-cli sch export netlist --format kicadxml --output ICA_EPS_Distribution.xml ~/pluto_eps_distribution/ICA_EPS_Distribution.kicad_sch
+python3 main.py ICA_EPS_Distribution.xml /Controller/Controller
 ```
