@@ -3,6 +3,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from snippet_map.snippet_map_xml import parse_snippet_map
+
 
 def main() -> None:
     if len(sys.argv) != 3 and len(sys.argv) != 4:
@@ -23,6 +25,8 @@ def main() -> None:
         )
         sys.exit(1)
     template_name = str(template_path.relative_to(template_env_path))
+
+    parse_snippet_map(snippet_map_path)
 
     env = Environment(loader=FileSystemLoader(template_env_path, followlinks=True))
     template = env.get_template(template_name)
