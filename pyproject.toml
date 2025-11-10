@@ -1,0 +1,30 @@
+[project]
+name = "kicad_code_gen"
+version = "0.1.0"
+dependencies = [
+    # TODO: version
+    "jinja2",
+]
+# TODO: possibly older version
+requires-python = ">3.13"
+authors = [
+    {name = "Christopher Besch", email = "mail@chris-besch.com"}
+]
+maintainers = [
+    {name = "Christopher Besch", email = "mail@chris-besch.com"}
+]
+# TODO
+description = ""
+# TODO
+# license = ""
+readme = "README.md"
+license-files = ["LICENSE"]
+# TODO
+keywords = []
+
+[tool.setuptools]
+packages = ["kicad_snippet_mapper", "snippet_code_gen", "snippet_map"]
+
+[project.scripts]
+kicad_snippet_mapper = "kicad_snippet_mapper.kicad_snippet_mapper:main"
+snippet_code_gen = "snippet_code_gen.snippet_code_gen:main"

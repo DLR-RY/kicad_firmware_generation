@@ -1,152 +1,42 @@
-#!/usr/bin/env python3
 import sys
-from pathlib import Path
-from typing import FrozenSet, Set, Dict, Tuple, NewType
 from datetime import datetime
-import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Dict, Set, Tuple
 
+from .intermediate_types import (
+    RawSnippet,
+    SnippetPinNameLookups,
+    SnippetsLookup,
+    SnippetsReverseLookup,
+)
+from .kicad_types import (
+    ComponentRef,
+    GlobalPinIdentifier,
+    Netlist,
+    NodePinName,
+    SheetPath,
+)
+from ..snippet_map.snippet_types import (
+    GlobalSnippetPinIdentifier,
+    MutableSnippetNet,
+    Snippet,
+    SnippetIdentifier,
+    SnippetMap,
+    SnippetNet,
+    SnippetNetList,
+    SnippetPath,
+    SnippetPinName,
+    SnippetType,
+    stringify_snippet_id,
+)
+from .netlist_xml import parse_netlist
+from ..snippet_map.snippet_map_xml import stringify_snippet_map
 
 SNIPPET_TYPE_FIELD_NAME = "SnippetType"
 SNIPPET_PIN_FIELD_PREFIX = "SnippetPin"
 SNIPPET_MAP_FIELD_PREFIX = "SnippetMapField"
+# TODO: set this properly
 TOOL_NAME = "kicad_snippet_mapper v0.1.0"
-XML_WARNING = "WARNING: This file has been automatically generated. Do not edit!"
-
-ComponentRef = NewType("ComponentRef", str)
-SheetPath = NewType("SheetPath", str)
-NodePinName = NewType("NodePinName", str)
-# globally unique descriptor for a pin
-GlobalPinIdentifier = NewType("GlobalPinIdentifier", Tuple[ComponentRef, NodePinName])
-NodePinFunction = NewType("NodePinFunction", str)
-
-# The path's nodes are separated with `/`.
-# There must be a leading slash and no trailing slash.
-SnippetPath = NewType("SnippetPath", str)
-SnippetType = NewType("SnippetType", str)
-SnippetIdentifier = NewType("SnippetIdentifier", Tuple[SnippetPath, SnippetType])
-SnippetPinName = NewType("SnippetPinName", str)
-GlobalSnippetPinIdentifier = NewType(
-    "GlobalSnippetPinIdentifier", Tuple[SnippetIdentifier, SnippetPinName]
-)
-# These pins are connected.
-MutableSnippetNet = NewType("MutableSnippetNet", Set[GlobalSnippetPinIdentifier])
-SnippetNet = NewType("SnippetNet", FrozenSet[GlobalSnippetPinIdentifier])
-SnippetNetList = NewType("SnippetNetList", Set[SnippetNet])
-
-
-def stringify_snippet_id(id: SnippetIdentifier) -> str:
-    return f"{id[0]}/{id[1]}"
-
-
-class Sheet:
-    path: SheetPath
-
-
-class Component:
-    ref: ComponentRef
-    sheetpath: SheetPath
-    fields: Dict[str, str]
-
-    def __repr__(self) -> str:
-        return f"Component(ref={self.ref!r}, sheetpath={self.sheetpath!r}, fields={list(self.fields.keys())!r})"
-
-
-# a pin on a component that is connected to some net(s)
-class Node:
-    ref: ComponentRef
-    pin: NodePinName
-    pinfunction: NodePinFunction
-
-    def __repr__(self) -> str:
-        return f"Node(ref={self.ref!r}, pin={self.pin!r}, pinfunction={self.pinfunction!r})"
-
-
-class Net:
-    nodes: Set[Node]
-
-    def __repr__(self) -> str:
-        return f"Net(nodes={len(self.nodes)} nodes)"
-
-
-class Netlist:
-    source: Path
-    sheets: Set[Sheet]
-    # Map component's ref to component.
-    components: Dict[ComponentRef, Component]
-    nets: Set[Net]
-
-    def __repr__(self) -> str:
-        return (
-            f"Netlist(source={self.source!r}, "
-            f"components={len(self.components)} components, "
-            f"nets={len(self.nets)} nets)"
-        )
-
-
-class Snippet:
-    path: SnippetPath
-    type_name: SnippetType
-    # Map key to value.
-    snippet_map_fields: Dict[str, str]
-    # Map snippet pin name to connected root snippet pin name.
-    # If this is the root snippet the value is always None.
-    pins: Dict[SnippetPinName, SnippetPinName | None]
-
-    def get_id(self) -> SnippetIdentifier:
-        return SnippetIdentifier((self.path, self.type_name))
-
-    def __repr__(self) -> str:
-        return (
-            f"Snippet(path={self.path!r}, type_name={self.type_name!r}, "
-            f"fields={list(self.snippet_map_fields.keys())!r}, pins={len(self.pins)})"
-        )
-
-
-class SnippetMap:
-    source: Path
-    date: datetime
-    tool: str
-
-    root_snippet: Snippet
-    snippets: Set[Snippet]
-
-    def __repr__(self) -> str:
-        return (
-            f"SnippetMap(source={self.source!r}, date={self.date.isoformat()}, "
-            f"tool={self.tool!r}, root_snippet={stringify_snippet_id(self.root_snippet.get_id())!r}, "
-            f"snippets={len(self.snippets)})"
-        )
-
-
-class RawSnippet:
-    path: SnippetPath
-    type_name: SnippetType
-    # Map key to value.
-    snippet_map_fields: Dict[str, str]
-
-    components: Set[Component]
-
-    def get_id(self) -> SnippetIdentifier:
-        return SnippetIdentifier((self.path, self.type_name))
-
-    def __repr__(self) -> str:
-        return (
-            f"RawSnippet(path={self.path!r}, type_name={self.type_name!r}, "
-            f"fields={list(self.snippet_map_fields.keys())!r}, components={len(self.components)})"
-        )
-
-
-# mapping from snippet name to the info we can directly pull from the KiCad netlist
-SnippetsLookup = NewType("SnippetsLookup", Dict[SnippetIdentifier, RawSnippet])
-# mapping from component ref to snippet name
-SnippetsReverseLookup = NewType(
-    "SnippetsReverseLookup", Dict[ComponentRef, SnippetIdentifier]
-)
-# For each snippet this resolves the pins global identifier to the explicitly chosen pin name.
-SnippetPinNameLookups = NewType(
-    "SnippetPinNameLookups",
-    Dict[SnippetIdentifier, Dict[GlobalPinIdentifier, SnippetPinName]],
-)
 
 
 def group_components_by_snippet(
@@ -469,142 +359,6 @@ def check_netlist_structure(netlist: Netlist) -> None:
             sys.exit(1)
 
 
-def parse_netlist(netlist_path: Path) -> Netlist:
-    netlist = Netlist()
-
-    tree = ET.parse(netlist_path)
-    root = tree.getroot()
-
-    source_tags = root.findall("./design/source")
-    assert len(source_tags) == 1
-    assert source_tags[0].text is not None
-    netlist.source = Path(source_tags[0].text)
-
-    netlist.sheets = set()
-    sheet_tags = root.findall("./design/sheet")
-    for sheet_tag in sheet_tags:
-        path = sheet_tag.get("name")
-        assert path is not None
-        sheet = Sheet()
-        sheet.path = SheetPath(path)
-        netlist.sheets.add(sheet)
-
-    comp_tags = root.findall("./components/comp")
-    netlist.components = dict()
-    for comp_tag in comp_tags:
-        component = Component()
-
-        component_ref = comp_tag.get("ref")
-        assert component_ref is not None
-        component.ref = ComponentRef(component_ref)
-
-        sheetpath_tags = comp_tag.findall("./sheetpath")
-        assert len(sheetpath_tags) == 1
-        sheetpath = sheetpath_tags[0].get("names")
-        assert sheetpath is not None
-        component.sheetpath = SheetPath(sheetpath)
-
-        field_tags = comp_tag.findall("./fields/field")
-        component.fields = dict()
-        for field_tag in field_tags:
-            field_name = field_tag.get("name")
-            assert field_name is not None
-            field_value = field_tag.text
-
-            assert field_name not in component.fields
-            # Default to empty string.
-            component.fields[field_name] = "" if field_value is None else field_value
-
-        assert component.ref not in netlist.components
-        netlist.components[component.ref] = component
-
-    net_tags = root.findall("./nets/net")
-    netlist.nets = set()
-    for net_tag in net_tags:
-        net = Net()
-
-        node_tags = net_tag.findall("./node")
-        net.nodes = set()
-        for node_tag in node_tags:
-            node = Node()
-
-            ref = node_tag.get("ref")
-            assert ref is not None
-            node.ref = ComponentRef(ref)
-
-            pin = node_tag.get("pin")
-            assert pin is not None
-            node.pin = NodePinName(pin)
-
-            pinfunction = node_tag.get("pinfunction")
-            node.pinfunction = NodePinFunction(
-                "" if pinfunction is None else pinfunction
-            )
-
-            # TODO: this assert doesn't actually do anything
-            assert node not in net.nodes
-            net.nodes.add(node)
-
-        # TODO: this assert doesn't actually do anything
-        assert net not in netlist.nets
-        netlist.nets.add(net)
-
-    return netlist
-
-
-def xmlify_snippet(snippet: Snippet, tag_name: str) -> ET.Element:
-    root = ET.Element(tag_name)
-    root.set("path", snippet.path)
-    root.set("type", snippet.type_name)
-
-    snippet_map_fields = ET.SubElement(root, "snippetMapFields")
-    for key, value in snippet.snippet_map_fields.items():
-        snippet_map_field = ET.SubElement(snippet_map_fields, "snippetMapField")
-        snippet_map_field.set("name", key)
-        snippet_map_field.text = value
-
-    xml_pins = ET.SubElement(root, "pins")
-    # Ensure xml is deterministic.
-    pins = list(snippet.pins.items())
-    pins.sort(key=lambda item: item[0])
-    for name, root_snippet_pin in pins:
-        pin = ET.SubElement(xml_pins, "pin")
-        pin.set("name", name)
-        if root_snippet_pin is not None:
-            pin.set("rootSnippetPin", root_snippet_pin)
-    return root
-
-
-def stringify_snippet_map(snippet_map: SnippetMap) -> bytes:
-    root = ET.Element("snippetMap")
-    warning_comment = ET.Comment(XML_WARNING)
-    root.append(warning_comment)
-
-    netlist = ET.SubElement(root, "netlist")
-    source = ET.SubElement(netlist, "source")
-    source.text = str(snippet_map.source)
-    date = ET.SubElement(netlist, "date")
-    date.text = snippet_map.date.isoformat()
-    tool = ET.SubElement(netlist, "tool")
-    tool.text = snippet_map.tool
-
-    root_snippet = xmlify_snippet(snippet_map.root_snippet, "rootSnippet")
-    root.append(root_snippet)
-
-    xml_snippets = ET.SubElement(root, "snippet")
-    # Ensure xml is deterministic.
-    snippets = list(snippet_map.snippets)
-    snippets.sort(key=lambda s: SnippetIdentifier((s.path, s.type_name)))
-    for snippet in snippets:
-        xml_snippet = xmlify_snippet(snippet, "snippet")
-        xml_snippets.append(xml_snippet)
-
-    ET.indent(root, space="    ", level=0)
-    return bytes(
-        ET.tostring(root, encoding="utf-8", method="xml", xml_declaration=True)
-    )
-
-
 def get_snippet_identifier(in_str: str) -> SnippetIdentifier:
     idx = in_str.rfind("/")
     if "/" not in in_str:
@@ -622,7 +376,7 @@ def get_snippet_identifier(in_str: str) -> SnippetIdentifier:
 def main() -> None:
     if len(sys.argv) != 3:
         print(
-            "Error: Provide two arguments: the input file path and the root snippet name",
+            "Error: Provide two arguments: the input file path and the root snippet name.",
             file=sys.stderr,
         )
         sys.exit(1)
