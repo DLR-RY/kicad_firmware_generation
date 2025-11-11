@@ -71,10 +71,10 @@ def _group_components_by_snippet(
             snippets[snippet_identifier].path = snippet_path
             snippets[snippet_identifier].type_name = snippet_type
             snippets[snippet_identifier].components = {component}
+            snippets[snippet_identifier].snippet_map_fields = dict()
         else:
             snippets[snippet_identifier].components.add(component)
 
-        snippets[snippet_identifier].snippet_map_fields = dict()
         for field_name, field_value in component.fields.items():
             if not field_name.startswith(SNIPPET_MAP_FIELD_PREFIX):
                 # This is not a SnippetMapField.
@@ -85,6 +85,7 @@ def _group_components_by_snippet(
                     f"Warning: The snippet {stringify_snippet_id(snippet_identifier)} contains a SnippetMapField with the empty string as key.",
                     file=sys.stderr,
                 )
+
             if (
                 snippet_map_field_name
                 in snippets[snippet_identifier].snippet_map_fields
@@ -254,6 +255,7 @@ def _gen_snippet_map(
         snippet.path = raw_snippet.path
         snippet.type_name = raw_snippet.type_name
         snippet.snippet_map_fields = raw_snippet.snippet_map_fields
+        print(snippet.snippet_map_fields, file=sys.stderr)
         snippet.pins = dict()
         snippets_lookup[SnippetIdentifier((snippet.path, snippet.type_name))] = snippet
 
