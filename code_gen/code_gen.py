@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import Dict, Set
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -7,6 +8,7 @@ from snippet_map.snippet_map_xml import parse_snippet_map
 from snippet_map.snippet_types import (
     SnippetMap,
     SnippetPath,
+    SnippetPinName,
     split_snippet_path,
 )
 from code_gen.snippet_sheet import SnippetSheet
@@ -15,10 +17,11 @@ from code_gen.snippet_sheet import SnippetSheet
 def _ensure_snippet_sheet_exists(path: SnippetPath, root: SnippetSheet) -> SnippetSheet:
     assert len(path) >= 1
     assert path[0] == "/"
+    assert path[-1] == "/"
 
     snippet_sheet = root
-    # skip the root node
-    for node in split_snippet_path(path)[1:]:
+    # skip the root node and the last slash
+    for node in split_snippet_path(path)[1:-1]:
         if node not in snippet_sheet.children:
             child_snippet_sheet = SnippetSheet()
             child_snippet_sheet.children = dict()
@@ -41,6 +44,25 @@ def _get_snippet_sheets(snippet_map: SnippetMap) -> SnippetSheet:
         assert snippet.type_name not in snippet_sheet.snippets
         snippet_sheet.snippets[snippet.type_name] = snippet
     return root
+
+
+# TODO: remove
+# def _get_pin_lookup(
+#     snippet_map: SnippetMap,
+# ) -> Dict[SnippetPinName, Set[SnippetPinName]]:
+#     """
+#     The snippet lookup only includes pins that are connected to the root snippet.
+#     """
+#     pins_lookup: Dict[SnippetPinName, Set[SnippetPinName]] = dict()
+#     for snippet in snippet_map.snippets:
+#         for pin_name, root_pin_name in snippet.pins.items():
+#             if root_pin_name is None:
+#                 continue
+#             if pin_name not in pins_lookup:
+#                 pins_lookup[pin_name] = {root_pin_name}
+#             else:
+#                 pins_lookup[pin_name].add(root_pin_name)
+#     return pins_lookup
 
 
 def main() -> None:

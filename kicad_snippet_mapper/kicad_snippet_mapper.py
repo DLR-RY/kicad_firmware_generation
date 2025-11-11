@@ -62,8 +62,7 @@ def _group_components_by_snippet(
             # This component is not part of any snippet.
             continue
         snippet_type = SnippetType(component.fields[SNIPPET_TYPE_FIELD_NAME])
-        snippet_path = SnippetPath(component.sheetpath.rstrip("/"))
-        assert snippet_path[0] == "/"
+        snippet_path = SnippetPath(component.sheetpath)
         snippet_identifier = SnippetIdentifier((snippet_path, snippet_type))
 
         if snippet_identifier not in snippets:
@@ -338,10 +337,11 @@ def _check_netlist_structure(netlist: Netlist) -> None:
         sheet_paths.add(sheet.path)
 
         nodes = sheet.path.split("/")
-        assert len(nodes) > 0
-        if len(nodes) > 0:
+        assert len(nodes) > 1
+        # Don't do this when we're already at the root.
+        if len(nodes) > 2:
             required_paths.add((
-                SheetPath("/".join(nodes[:-2]) + "/"),
+                SheetPath("/".join(nodes[:-1]) + "/"),
                 sheet.path,
             ))
 
@@ -369,7 +369,7 @@ def _get_snippet_identifier(in_str: str) -> SnippetIdentifier:
         )
         sys.exit(1)
     return SnippetIdentifier((
-        SnippetPath(in_str[0:idx]),
+        SnippetPath(in_str[0 : idx + 1]),
         SnippetType(in_str[idx + 1 :]),
     ))
 

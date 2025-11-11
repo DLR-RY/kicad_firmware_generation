@@ -63,10 +63,11 @@ class SnippetMap:
 
 
 def stringify_snippet_id(id: SnippetIdentifier) -> str:
-    return f"{id[0]}/{id[1]}"
+    return f"{id[0]}{id[1]}"
 
 
 def split_snippet_path(path: SnippetPath) -> List[SnippetPathNode]:
     assert len(path) >= 1
     assert path[0] == "/"
+    assert path[-1] == "/"
     return [SnippetPathNode(node_str) for node_str in path.split("/")]
