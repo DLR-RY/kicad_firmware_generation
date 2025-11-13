@@ -13,4 +13,4 @@ board.h: ICA_EPS_Distribution_snippet_map.xml
 	python3 -m code_gen.code_gen ICA_EPS_Distribution_snippet_map.xml pluto_eps_templates/board.h.tmpl > board.h
 
 clean:
-	rm -vf ICA_EPS_Distribution_netlist.xml ICA_EPS_Distribution_snippet_map.xml board.h
+	rm -vf ICA_EPS_Distribution_netlist.xml ICA_EPS_Distribution_snippet_netlist.xml ICA_EPS_Distribution_snippet_map.xml board.h
