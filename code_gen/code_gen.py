@@ -3,7 +3,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from common_types.snippet_xml import parse_snippet_map
+from common_types.snippet_xml import parse_one_to_many_snippet_map
 from common_types.snippet_types import (
     SnippetMap,
     SnippetPath,
@@ -83,7 +83,7 @@ def main() -> None:
         sys.exit(1)
     template_name = str(template_path.relative_to(template_env_path))
 
-    snippet_map = parse_snippet_map(snippet_map_path)
+    snippet_map = parse_one_to_many_snippet_map(snippet_map_path)
     root_snippet_sheet = _get_snippet_sheets(snippet_map)
 
     env = Environment(

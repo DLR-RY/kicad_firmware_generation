@@ -9,6 +9,7 @@ from common_types.snippet_types import (
     SnippetNetlist,
     SnippetPath,
     SnippetPinName,
+    OtherSnippetPinType,
     SnippetType,
     stringify_snippet_id,
 )
@@ -18,11 +19,12 @@ SNIPPET_TYPE_FIELD_NAME = "SnippetType"
 TOOL_NAME = "snippet_one_to_many_mapper v0.1.0"
 
 
-def _gen_snippet_map(
+def _gen_one_to_many_snippet_map(
     netlist: SnippetNetlist, root_snippet_identifier: SnippetIdentifier
 ) -> SnippetMap:
     # general metadata
     snippet_map = SnippetMap()
+    snippet_map.map_type = OtherSnippetPinType.ONE_TO_MANY
     snippet_map.source = netlist.source
     snippet_map.date = datetime.now()
     snippet_map.tool = TOOL_NAME
@@ -119,7 +121,7 @@ def main() -> None:
     snippet_netlist_path = Path(sys.argv[1])
     root_snippet_identifier = _get_snippet_identifier(sys.argv[2])
     snippet_netlist = parse_snippet_netlist(snippet_netlist_path)
-    snippet_map = _gen_snippet_map(snippet_netlist, root_snippet_identifier)
+    snippet_map = _gen_one_to_many_snippet_map(snippet_netlist, root_snippet_identifier)
     sys.stdout.buffer.write(stringify_snippet_map(snippet_map))
 
 

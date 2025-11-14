@@ -2,13 +2,14 @@ import sys
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Set, Tuple
 
 from common_types.snippet_types import (
     GlobalSnippetPinIdentifier,
     Snippet,
     SnippetIdentifier,
     SnippetMap,
+    OtherSnippetPinType,
     SnippetNet,
     SnippetNetlist,
     SnippetPath,
@@ -19,7 +20,11 @@ from common_types.snippet_types import (
 XML_WARNING = "WARNING: This file has been automatically generated. Do not edit!"
 
 
-def _xmlify_snippet(snippet: Snippet, tag_name: str) -> ET.Element:
+def _xmlify_snippet(
+    snippet: Snippet,
+    other_snippet_pin_type: OtherSnippetPinType,
+    tag_name: str,
+) -> ET.Element:
     root = ET.Element(tag_name)
     root.set("path", snippet.path)
     root.set("type", snippet.type_name)
@@ -34,20 +39,43 @@ def _xmlify_snippet(snippet: Snippet, tag_name: str) -> ET.Element:
     # Ensure xml is deterministic.
     pins = list(snippet.pins.items())
     pins.sort(key=lambda item: item[0])
-    for name, root_snippet_pin in pins:
+    for name, pin_connection in pins:
         pin = ET.SubElement(xml_pins, "pin")
         pin.set("name", name)
-        if root_snippet_pin is not None:
-            pin.set("rootSnippetPin", root_snippet_pin)
+
+        if other_snippet_pin_type == OtherSnippetPinType.MANY_TO_MANY:
+            # This should be a Set[GlobalSnippetPinIdentifier] but that typing isn't present at runtime
+            assert type(pin_connection) is set
+            other_pins = list(pin_connection)
+            other_pins.sort()
+            for other_pin in other_pins:
+                xml_other_pin = ET.SubElement(pin, "otherPin")
+                xml_other_pin.set("path", other_pin[0][0])
+                xml_other_pin.set("type", other_pin[0][1])
+                xml_other_pin.set("pin", other_pin[1])
+        elif other_snippet_pin_type == OtherSnippetPinType.ONE_TO_MANY:
+            root_snippet_pin = pin_connection
+            if root_snippet_pin is not None:
+                # This should be a SnippetPinName but is actually a str at runtime...
+                assert type(root_snippet_pin) is str
+                pin.set("rootSnippetPin", root_snippet_pin)
+        else:
+            assert other_snippet_pin_type == OtherSnippetPinType.NO_OTHER_PINS
+            assert pin_connection is None
+            # is None: don't add anything
     return root
 
 
-def _xmlify_snippets(snippets: List[Snippet], tag_name: str) -> ET.Element:
+def _xmlify_snippets(
+    snippets: List[Snippet],
+    other_snippet_pin_type: OtherSnippetPinType,
+    tag_name: str,
+) -> ET.Element:
     xml_snippets = ET.Element(tag_name)
     # Ensure xml is deterministic.
     snippets.sort(key=lambda s: s.get_id())
     for snippet in snippets:
-        xml_snippet = _xmlify_snippet(snippet, "snippet")
+        xml_snippet = _xmlify_snippet(snippet, other_snippet_pin_type, "snippet")
         xml_snippets.append(xml_snippet)
     return xml_snippets
 
@@ -107,7 +135,13 @@ def stringify_snippet_netlist(snippet_netlist: SnippetNetlist) -> bytes:
         snippet_netlist.tool,
         "snippetNetlist",
     )
-    root.append(_xmlify_snippets(list(snippet_netlist.snippets.values()), "snippets"))
+    root.append(
+        _xmlify_snippets(
+            list(snippet_netlist.snippets.values()),
+            OtherSnippetPinType.NO_OTHER_PINS,
+            "snippets",
+        )
+    )
     root.append(_xmlify_nets(list(snippet_netlist.nets), "nets"))
     return _stringify_xml(root)
 
@@ -116,12 +150,27 @@ def stringify_snippet_map(snippet_map: SnippetMap) -> bytes:
     root = _create_xml_root(
         snippet_map.source, snippet_map.date, snippet_map.tool, "snippetMap"
     )
-    root.append(_xmlify_snippet(snippet_map.root_snippet, "rootSnippet"))
-    root.append(_xmlify_snippets(list(snippet_map.snippets), "snippets"))
+    if snippet_map.map_type == OtherSnippetPinType.ONE_TO_MANY:
+        assert snippet_map.root_snippet is not None
+        assert snippet_map.map_type == OtherSnippetPinType.ONE_TO_MANY
+        root.append(
+            _xmlify_snippet(
+                snippet_map.root_snippet,
+                OtherSnippetPinType.NO_OTHER_PINS,
+                "rootSnippet",
+            )
+        )
+    else:
+        # NO_OTHER_PINS is not possible for a snippet map.
+        assert snippet_map.map_type == OtherSnippetPinType.MANY_TO_MANY
+        assert snippet_map.root_snippet is None
+    root.append(
+        _xmlify_snippets(list(snippet_map.snippets), snippet_map.map_type, "snippets")
+    )
     return _stringify_xml(root)
 
 
-def _parse_snippet(snippet_tag: ET.Element) -> Snippet:
+def _parse_snippet(snippet_tag: ET.Element, map_type: OtherSnippetPinType) -> Snippet:
     snippet = Snippet()
 
     path = snippet_tag.get("path")
@@ -147,11 +196,43 @@ def _parse_snippet(snippet_tag: ET.Element) -> Snippet:
     for snippet_pin_tag in snippet_pin_tags:
         name = snippet_pin_tag.get("name")
         assert name is not None
+        pin_name = SnippetPinName(name)
         root_snippet_pin = snippet_pin_tag.get("rootSnippetPin")
-        assert SnippetPinName(name) not in snippet.pins
-        snippet.pins[SnippetPinName(name)] = (
-            None if root_snippet_pin is None else SnippetPinName(root_snippet_pin)
-        )
+        assert pin_name not in snippet.pins
+        if map_type == OtherSnippetPinType.NO_OTHER_PINS:
+            # This is a netlist.
+            assert len(snippet_pin_tag) == 0
+            assert root_snippet_pin is None
+            snippet.pins[pin_name] = None
+        elif map_type == OtherSnippetPinType.ONE_TO_MANY:
+            # This is a one-to-many map.
+            assert len(snippet_pin_tag) == 0
+            snippet.pins[pin_name] = (
+                None if root_snippet_pin is None else SnippetPinName(root_snippet_pin)
+            )
+        else:
+            # This is a many-to-many map, let's see what other snippets this pin is connected to.
+            assert map_type == OtherSnippetPinType.MANY_TO_MANY
+            other_pins: Set[GlobalSnippetPinIdentifier] = set()
+            for other_pin_tag in snippet_pin_tag.findall("./otherPin"):
+                other_snippet_path = other_pin_tag.get("path")
+                assert other_snippet_path is not None
+
+                other_snippet_type = other_pin_tag.get("type")
+                assert other_snippet_type is not None
+
+                other_snippet_pin = other_pin_tag.get("pin")
+                assert other_snippet_pin is not None
+
+                other_pin_id = GlobalSnippetPinIdentifier((
+                    SnippetIdentifier((
+                        SnippetPath(other_snippet_pin),
+                        SnippetType(other_snippet_type),
+                    )),
+                    SnippetPinName(other_snippet_pin),
+                ))
+                other_pins.add(other_pin_id)
+            snippet.pins[pin_name] = other_pins
 
     return snippet
 
@@ -216,7 +297,7 @@ def parse_snippet_netlist(snippet_netlist_path: Path) -> SnippetNetlist:
     snippet_tags = root.findall("./snippets/snippet")
     snippet_netlist.snippets = dict()
     for snippet_tag in snippet_tags:
-        snippet = _parse_snippet(snippet_tag)
+        snippet = _parse_snippet(snippet_tag, OtherSnippetPinType.NO_OTHER_PINS)
         snippet_id = snippet.get_id()
         assert snippet_id not in snippet_netlist.snippets
         snippet_netlist.snippets[snippet_id] = snippet
@@ -236,25 +317,56 @@ def parse_snippet_netlist(snippet_netlist_path: Path) -> SnippetNetlist:
     return snippet_netlist
 
 
-def parse_snippet_map(snippet_map_path: Path) -> SnippetMap:
+def parse_one_to_many_snippet_map(snippet_map_path: Path) -> SnippetMap:
     snippet_map = SnippetMap()
+    snippet_map.map_type = OtherSnippetPinType.ONE_TO_MANY
     root, snippet_map.source, snippet_map.date, snippet_map.tool = _parse_xml_root(
         snippet_map_path
     )
 
     root_snippet_tags = root.findall("./rootSnippet")
     assert len(root_snippet_tags) == 1
-    snippet_map.root_snippet = _parse_snippet(root_snippet_tags[0])
+    snippet_map.root_snippet = _parse_snippet(
+        root_snippet_tags[0], OtherSnippetPinType.ONE_TO_MANY
+    )
 
     connected_snippets = root.findall("./snippets/snippet")
-    snippet_map.snippets = {_parse_snippet(snippet) for snippet in connected_snippets}
+    snippet_map.snippets = {
+        _parse_snippet(snippet, OtherSnippetPinType.ONE_TO_MANY)
+        for snippet in connected_snippets
+    }
 
     # Check that stringifying what we parsed gets us back.
     with open(snippet_map_path, "rb") as snippet_map_file:
         check_snippet_map = stringify_snippet_map(snippet_map)
         if check_snippet_map != snippet_map_file.read():
             print(
-                "Warning: The snippet map was created with a different stringify algorithm or is buggy.",
+                "Warning: The one-to-many snippet map was created with a different stringify algorithm or is buggy.",
+                file=sys.stderr,
+            )
+
+    return snippet_map
+
+
+def parse_many_to_many_snippet_map(snippet_map_path: Path) -> SnippetMap:
+    snippet_map = SnippetMap()
+    snippet_map.map_type = OtherSnippetPinType.MANY_TO_MANY
+    root, snippet_map.source, snippet_map.date, snippet_map.tool = _parse_xml_root(
+        snippet_map_path
+    )
+
+    snippets = root.findall("./snippets/snippet")
+    snippet_map.snippets = {
+        _parse_snippet(snippet, OtherSnippetPinType.MANY_TO_MANY)
+        for snippet in snippets
+    }
+
+    # Check that stringifying what we parsed gets us back.
+    with open(snippet_map_path, "rb") as snippet_map_file:
+        check_snippet_map = stringify_snippet_map(snippet_map)
+        if check_snippet_map != snippet_map_file.read():
+            print(
+                "Warning: The many-to-many snippet map was created with a different stringify algorithm or is buggy.",
                 file=sys.stderr,
             )
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Dict, FrozenSet, List, NewType, Set, Tuple
 
@@ -30,10 +31,12 @@ class Snippet:
     """
     snippet_map_fields: Dict[str, str]
     """
-    Map snippet pin name to connected root snippet pin name.
+    If we are generating a one-to-many map (OtherSnippetPinType.ONE_TO_MANY), map snippet pin name to connected root snippet pin name.
     If this is the root snippet the value is always None.
+    If we are generating a snippet netlist (OtherSnippetPinType.NO_PINS), the value is also always None.
+    If we are generating a many-to-many map (OtherSnippetPinType.MANY_TO_MANY), the value is a set of all connected pins.
     """
-    pins: Dict[SnippetPinName, SnippetPinName | None]
+    pins: Dict[SnippetPinName, SnippetPinName | None | Set[GlobalSnippetPinIdentifier]]
 
     def get_id(self) -> SnippetIdentifier:
         return SnippetIdentifier((self.path, self.type_name))
@@ -45,18 +48,29 @@ class Snippet:
         )
 
 
+class OtherSnippetPinType(Enum):
+    NO_OTHER_PINS = "NO_OTHER_PINS"
+    ONE_TO_MANY = "ONE_TO_MANY"
+    MANY_TO_MANY = "MANY_TO_MANY"
+
+
 class SnippetMap:
+    map_type: OtherSnippetPinType
+
     source: Path
     date: datetime
     tool: str
 
-    root_snippet: Snippet
+    """
+    None iff this is a many-to-many snippet map.
+    """
+    root_snippet: Snippet | None
     snippets: Set[Snippet]
 
     def __repr__(self) -> str:
         return (
             f"SnippetMap(source={self.source!r}, date={self.date.isoformat()}, "
-            f"tool={self.tool!r}, root_snippet={stringify_snippet_id(self.root_snippet.get_id())!r}, "
+            f"tool={self.tool!r}, root_snippet={None if self.root_snippet is None else stringify_snippet_id(self.root_snippet.get_id())!r}, "
             f"snippets={len(self.snippets)})"
         )
 
