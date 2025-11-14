@@ -60,8 +60,13 @@ def _gen_one_to_many_snippet_map(
                         file=sys.stderr,
                     )
                     # Remove those pins from the root snippet.
-                    for _, pin_name_to_remove in net:
-                        netlist.snippets[snippet_identifier].pins.pop(
+                    for snippet_id_of_in_to_remove, pin_name_to_remove in net:
+                        if snippet_id_of_in_to_remove != root_snippet_pin_name:
+                            # Skip all snippets that aren't the root snippet.
+                            # Those snippets get to keep all their pins.
+                            continue
+                        print(snippet_identifier, pin_name_to_remove, file=sys.stderr)
+                        netlist.snippets[root_snippet_identifier].pins.pop(
                             pin_name_to_remove
                         )
                     root_snippet_pin_name = None
