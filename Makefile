@@ -15,8 +15,8 @@ ICA_EPS_Distribution_snippet_many_to_many_map.xml: ICA_EPS_Distribution_snippet_
 ICA_EPS_Distribution_snippet_many_to_many_map_connectors.xml: ICA_EPS_Distribution_snippet_netlist.xml
 	python3 -m snippet_many_to_many_mapper.snippet_many_to_many_mapper --root-snippet-glob '/**/Connector*' --simplify-pins 'GND' ICA_EPS_Distribution_snippet_netlist.xml > ICA_EPS_Distribution_snippet_many_to_many_map_connectors.xml
 
-board.h: ICA_EPS_Distribution_snippet_one_to_many_map.xml
-	python3 -m code_gen.code_gen ICA_EPS_Distribution_snippet_one_to_many_map.xml pluto_eps_templates/board.h.tmpl > board.h
+board.h: ICA_EPS_Distribution_snippet_many_to_many_map.xml
+	python3 -m code_gen.code_gen ICA_EPS_Distribution_snippet_many_to_many_map.xml pluto_eps_templates/board.h.tmpl > board.h
 
 connectors.csv: ICA_EPS_Distribution_snippet_many_to_many_map_connectors.xml
 	python3 -m map_to_csv.map_to_csv ICA_EPS_Distribution_snippet_many_to_many_map_connectors.xml > connectors.csv

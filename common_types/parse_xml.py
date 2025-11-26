@@ -63,6 +63,8 @@ def _parse_snippet(
             )
         else:
             # This is a many-to-many map, let's see what other snippets this pin is connected to.
+            # TODO: create a pretty error message when the user uses a one_to_many instead of many-to-many map.
+            assert root_snippet_pin is None
             assert other_snippet_pin_type == OtherSnippetPinType.MANY_TO_MANY
             other_pins: Set[GlobalSnippetPinIdentifier] = set()
             for other_pin_tag in snippet_pin_tag.findall("./otherPin"):
@@ -206,6 +208,9 @@ def parse_many_to_many_snippet_map(snippet_map_path: Path) -> SnippetMap:
         snippet_map_path
     )
     snippet_map.root_snippet = None
+
+    root_snippet_tags = root.findall("./rootSnippet")
+    assert len(root_snippet_tags) == 0
 
     snippets = root.findall("./snippets/snippet")
     snippet_map.snippets = {

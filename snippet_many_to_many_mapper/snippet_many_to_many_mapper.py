@@ -1,10 +1,8 @@
-import glob
 import argparse
-import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import NewType, Set
+from typing import Set
 
 from common_types.parse_xml import parse_snippet_netlist
 from common_types.snippet_types import (
@@ -16,28 +14,14 @@ from common_types.snippet_types import (
     SnippetPath,
     SnippetPinName,
     SnippetType,
-    stringify_snippet_id,
+    SnippetGlob,
+    does_match_pattern,
+    compile_snippet_glob,
 )
 from common_types.stringify_xml import stringify_snippet_map
 
 # TODO: set this properly
 TOOL_NAME = "snippet_many_to_many_mapper v0.1.0"
-
-SnippetGlob = NewType("SnippetGlob", re.Pattern[str])
-
-
-def _compile_snippet_glob(snippet_glob_str: str) -> SnippetGlob:
-    regex = glob.translate(snippet_glob_str, recursive=True, include_hidden=True)
-    return SnippetGlob(re.compile(regex))
-
-
-def _does_match_pattern(
-    pattern: SnippetGlob | None, snippet_id: SnippetIdentifier, when_none: bool
-) -> bool:
-    if pattern is None:
-        return when_none
-    found = pattern.match(stringify_snippet_id(snippet_id)) is not None
-    return found
 
 
 def _gen_many_to_many_snippet_map(
@@ -65,7 +49,7 @@ def _gen_many_to_many_snippet_map(
                 if other_pin
                 != GlobalSnippetPinIdentifier((snippet_identifier, snippet_pin_name))
                 # Skip other
-                and not _does_match_pattern(root_snippet_pattern, other_pin[0], False)
+                and not does_match_pattern(root_snippet_pattern, other_pin[0], False)
             }
 
     # Simplify some nets.
@@ -104,7 +88,7 @@ def _gen_many_to_many_snippet_map(
     snippet_map.snippets = {
         snippet
         for snippet in netlist.snippets.values()
-        if _does_match_pattern(root_snippet_pattern, snippet.get_id(), True)
+        if does_match_pattern(root_snippet_pattern, snippet.get_id(), True)
     }
     return snippet_map
 
@@ -138,7 +122,7 @@ def main() -> None:
     root_snippet_glob = (
         None
         if args.root_snippet_glob is None
-        else _compile_snippet_glob(args.root_snippet_glob)
+        else compile_snippet_glob(args.root_snippet_glob)
     )
     simplify_pins: Set[SnippetPinName] = {
         SnippetPinName(pin)

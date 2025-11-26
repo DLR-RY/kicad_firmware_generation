@@ -1,66 +1,40 @@
 import sys
 from pathlib import Path
+from typing import Set
 
 from jinja2 import Environment, FileSystemLoader
 
-from code_gen.snippet_sheet import SnippetSheet
-from common_types.parse_xml import parse_one_to_many_snippet_map
+from common_types.parse_xml import parse_many_to_many_snippet_map
 from common_types.snippet_types import (
-    SnippetMap,
-    SnippetPath,
-    split_snippet_path,
+    Snippet,
+    compile_snippet_glob,
+    does_match_pattern,
+    get_parent_snippet_path,
+    stringify_snippet_id,
 )
 
 
-def _ensure_snippet_sheet_exists(path: SnippetPath, root: SnippetSheet) -> SnippetSheet:
-    assert len(path) >= 1
-    assert path[0] == "/"
-    assert path[-1] == "/"
-
-    snippet_sheet = root
-    # skip the root node and the last slash
-    for node in split_snippet_path(path)[1:-1]:
-        if node not in snippet_sheet.children:
-            child_snippet_sheet = SnippetSheet()
-            child_snippet_sheet.children = dict()
-            child_snippet_sheet.parent = snippet_sheet
-            child_snippet_sheet.snippets = dict()
-            snippet_sheet.children[node] = child_snippet_sheet
-        snippet_sheet = snippet_sheet.children[node]
-        assert snippet_sheet is not None
-    return snippet_sheet
+def _change_case(in_str: str, first_upper: bool) -> str:
+    out_str = ""
+    next_upper = first_upper
+    for c in in_str:
+        if c == "/" or c == "_":
+            next_upper = True
+            continue
+        if next_upper:
+            out_str += c.upper()
+        else:
+            out_str += c.lower()
+        next_upper = False
+    return out_str
 
 
-def _get_snippet_sheets(snippet_map: SnippetMap) -> SnippetSheet:
-    root = SnippetSheet()
-    root.children = dict()
-    root.parent = None
-    root.snippets = dict()
-
-    for snippet in snippet_map.snippets:
-        snippet_sheet = _ensure_snippet_sheet_exists(snippet.path, root)
-        assert snippet.type_name not in snippet_sheet.snippets
-        snippet_sheet.snippets[snippet.type_name] = snippet
-    return root
+def _pascal_case(in_str: str) -> str:
+    return _change_case(in_str, True)
 
 
-# TODO: remove
-# def _get_pin_lookup(
-#     snippet_map: SnippetMap,
-# ) -> Dict[SnippetPinName, Set[SnippetPinName]]:
-#     """
-#     The snippet lookup only includes pins that are connected to the root snippet.
-#     """
-#     pins_lookup: Dict[SnippetPinName, Set[SnippetPinName]] = dict()
-#     for snippet in snippet_map.snippets:
-#         for pin_name, root_pin_name in snippet.pins.items():
-#             if root_pin_name is None:
-#                 continue
-#             if pin_name not in pins_lookup:
-#                 pins_lookup[pin_name] = {root_pin_name}
-#             else:
-#                 pins_lookup[pin_name].add(root_pin_name)
-#     return pins_lookup
+def _camel_case(in_str: str) -> str:
+    return _change_case(in_str, False)
 
 
 def main() -> None:
@@ -83,8 +57,16 @@ def main() -> None:
         sys.exit(1)
     template_name = str(template_path.relative_to(template_env_path))
 
-    snippet_map = parse_one_to_many_snippet_map(snippet_map_path)
-    root_snippet_sheet = _get_snippet_sheets(snippet_map)
+    snippet_map = parse_many_to_many_snippet_map(snippet_map_path)
+
+    # TODO: sort
+    def glob_snippets(glob_str: str) -> Set[Snippet]:
+        pattern = compile_snippet_glob(glob_str)
+        return {
+            snippet
+            for snippet in snippet_map.snippets
+            if does_match_pattern(pattern, snippet.get_id())
+        }
 
     env = Environment(
         loader=FileSystemLoader(
@@ -98,7 +80,11 @@ def main() -> None:
     print(
         template.render(
             snippet_map=snippet_map,
-            root_snippet_sheet=root_snippet_sheet,
+            glob_snippets=glob_snippets,
+            stringify_snippet_id=stringify_snippet_id,
+            pascal_case=_pascal_case,
+            camel_case=_camel_case,
+            get_parent_snippet_path=get_parent_snippet_path,
         )
     )
 

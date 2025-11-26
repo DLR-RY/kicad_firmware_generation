@@ -1,6 +1,9 @@
+import glob
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
+import sys
 from typing import Dict, FrozenSet, List, NewType, Set, Tuple
 
 """
@@ -22,6 +25,8 @@ These pins are connected.
 MutableSnippetNet = NewType("MutableSnippetNet", Set[GlobalSnippetPinIdentifier])
 SnippetNet = NewType("SnippetNet", FrozenSet[GlobalSnippetPinIdentifier])
 
+SnippetGlob = NewType("SnippetGlob", re.Pattern[str])
+
 
 class Snippet:
     path: SnippetPath
@@ -40,6 +45,36 @@ class Snippet:
 
     def get_id(self) -> SnippetIdentifier:
         return SnippetIdentifier((self.path, self.type_name))
+
+    def get_pins_to_glob(
+        self, glob_str: str
+    ) -> Dict[SnippetPinName, Set[GlobalSnippetPinIdentifier]]:
+        pattern = compile_snippet_glob(glob_str)
+        pins: Dict[SnippetPinName, Set[GlobalSnippetPinIdentifier]] = dict()
+        for pin, other_pins in self.pins.items():
+            # This should be Set[GlobalSnippetPinIdentifier] but that isn't kown at runtime.
+            assert type(other_pins) is set
+            pins[pin] = {
+                GlobalSnippetPinIdentifier((other_snippet, other_pin))
+                for (other_snippet, other_pin) in other_pins
+                if does_match_pattern(pattern, other_snippet)
+            }
+        return pins
+
+    def get_single_pin_to_glob(
+        self, pin_name: SnippetPinName, other_snippet_glob_str: str
+    ) -> GlobalSnippetPinIdentifier | None:
+        filtered_pins = self.get_pins_to_glob(other_snippet_glob_str)
+        assert pin_name in filtered_pins
+        other_snippet_pins = list(filtered_pins[pin_name])
+        if len(other_snippet_pins) > 1:
+            print(
+                f"Warning: the pins {other_snippet_pins} on {other_snippet_glob_str} are connected together. The script only considers the first in get_single_pin_to_glob.",
+                file=sys.stderr,
+            )
+        if len(other_snippet_pins) == 0:
+            return None
+        return other_snippet_pins[0]
 
     def __repr__(self) -> str:
         return (
@@ -100,3 +135,25 @@ def split_snippet_path(path: SnippetPath) -> List[SnippetPathNode]:
     assert path[0] == "/"
     assert path[-1] == "/"
     return [SnippetPathNode(node_str) for node_str in path.split("/")]
+
+
+def get_parent_snippet_path(path: SnippetPath) -> SnippetPath:
+    nodes = split_snippet_path(path)
+    assert len(nodes) >= 3
+    nodes.pop(-2)
+    return SnippetPath("/".join(nodes))
+
+
+def compile_snippet_glob(snippet_glob_str: str) -> SnippetGlob:
+    regex = glob.translate(snippet_glob_str, recursive=True, include_hidden=True)
+    return SnippetGlob(re.compile(regex))
+
+
+# TODO: maybe make a class out of this.
+def does_match_pattern(
+    pattern: SnippetGlob | None, snippet_id: SnippetIdentifier, when_none=False
+) -> bool:
+    if pattern is None:
+        return when_none
+    found = pattern.match(stringify_snippet_id(snippet_id)) is not None
+    return found
