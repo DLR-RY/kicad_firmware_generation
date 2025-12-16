@@ -1,8 +1,8 @@
 import sys
 from pathlib import Path
-from typing import Set
+from typing import List, Set
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 from common_types.parse_xml import parse_many_to_many_group_map
 from common_types.group_types import (
@@ -17,8 +17,8 @@ from common_types.group_types import (
 def _change_case(in_str: str, first_upper: bool) -> str:
     out_str = ""
     next_upper = first_upper
-    for c in in_str:
-        if c == "/" or c == "_":
+    for c in in_str.lower():
+        if c not in "abcdefghijklmnopqrstuvwxyz0123456789":
             next_upper = True
             continue
         if next_upper:
@@ -59,14 +59,15 @@ def main() -> None:
 
     group_map = parse_many_to_many_group_map(group_map_path)
 
-    # TODO: sort
-    def glob_groups(glob_str: str) -> Set[Group]:
+    def glob_groups(glob_str: str) -> List[Group]:
         pattern = compile_group_glob(glob_str)
-        return {
+        groups = list({
             group
             for group in group_map.groups
             if does_match_pattern(pattern, group.get_id())
-        }
+        })
+        groups.sort(key=lambda g: g.get_id())
+        return groups
 
     env = Environment(
         loader=FileSystemLoader(
@@ -75,6 +76,7 @@ def main() -> None:
         ),
         trim_blocks=True,
         lstrip_blocks=True,
+        undefined=StrictUndefined,
     )
     template = env.get_template(template_name)
     print(

@@ -46,13 +46,18 @@ class Group:
     def get_id(self) -> GroupIdentifier:
         return GroupIdentifier((self.path, self.type_name))
 
-    def get_pins_to_glob(
+    def _get_pins_to_glob(
         self, glob_str: str
     ) -> Dict[GroupPinName, Set[GlobalGroupPinIdentifier]]:
+        """
+        Return all pins of this group.
+        For each returned pin, return a set of the pins on other groups that match `glob_str`.
+        This means that all other groups that don't match are ignored.
+        """
         pattern = compile_group_glob(glob_str)
         pins: Dict[GroupPinName, Set[GlobalGroupPinIdentifier]] = dict()
         for pin, other_pins in self.pins.items():
-            # This should be Set[GlobalGroupPinIdentifier] but that isn't kown at runtime.
+            # This should be Set[GlobalGroupPinIdentifier] but that isn't known at runtime.
             assert type(other_pins) is set
             pins[pin] = {
                 GlobalGroupPinIdentifier((other_group, other_pin))
@@ -61,10 +66,26 @@ class Group:
             }
         return pins
 
+    # def get_pins_to_glob_reduced(
+    #     self, glob_str: str
+    # ) -> Dict[GroupPinName, Set[GlobalGroupPinIdentifier]]:
+    #     """
+    #     Same as get_pins_to_glob but with all pins that aren't connected to anything removed.
+    #     """
+    #     return {
+    #         pin: other_pins
+    #         for (pin, other_pins) in self._get_pins_to_glob(glob_str).items()
+    #         if len(other_pins) > 0
+    #     }
+
     def get_single_pin_to_glob(
         self, pin_name: GroupPinName, other_group_glob_str: str
     ) -> GlobalGroupPinIdentifier | None:
-        filtered_pins = self.get_pins_to_glob(other_group_glob_str)
+        """
+        Check if the given pin with name `pin_name` is connected to an other group that matches `other_group_glob_str`.
+        This function only makes sense on pins that aren't
+        """
+        filtered_pins = self._get_pins_to_glob(other_group_glob_str)
         assert pin_name in filtered_pins
         other_group_pins = list(filtered_pins[pin_name])
         if len(other_group_pins) > 1:
