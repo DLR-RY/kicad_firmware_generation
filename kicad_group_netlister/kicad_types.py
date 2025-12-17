@@ -6,6 +6,7 @@ from common_types.group_types import (
     GroupPath,
     GroupPinName,
     GroupType,
+    Schematic,
 )
 
 KiCadComponentRef = NewType("KiCadComponentRef", str)
@@ -51,6 +52,7 @@ KiCadNet = NewType("KiCadNet", FrozenSet[KiCadNode])
 
 class KiCadNetlist:
     source: Path
+    schematic: Schematic
     sheets: Set[KiCadSheet]
     """
     Map component's ref to component.
@@ -67,6 +69,7 @@ class KiCadNetlist:
 
 
 class RawGroup:
+    schematic: Schematic
     path: GroupPath
     type_name: GroupType
     """
@@ -77,7 +80,7 @@ class RawGroup:
     components: Set[KiCadComponent]
 
     def get_id(self) -> GroupIdentifier:
-        return GroupIdentifier((self.path, self.type_name))
+        return GroupIdentifier((self.schematic, self.path, self.type_name))
 
     def __repr__(self) -> str:
         return (

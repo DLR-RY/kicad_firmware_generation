@@ -15,6 +15,7 @@ from common_types.group_types import (
     GroupPath,
     GroupPinName,
     GroupType,
+    Schematic,
 )
 from common_types.stringify_xml import stringify_group_map, stringify_group_netlist
 
@@ -23,6 +24,10 @@ def _parse_group(
     group_tag: ET.Element, other_group_pin_type: OtherGroupPinType
 ) -> Group:
     group = Group()
+
+    schematic = group_tag.get("schematic")
+    assert schematic is not None
+    group.schematic = Schematic(schematic)
 
     path = group_tag.get("path")
     assert path is not None
@@ -68,6 +73,9 @@ def _parse_group(
             assert other_group_pin_type == OtherGroupPinType.MANY_TO_MANY
             other_pins: Set[GlobalGroupPinIdentifier] = set()
             for other_pin_tag in group_pin_tag.findall("./otherPin"):
+                other_group_schematic = other_pin_tag.get("schematic")
+                assert other_group_schematic is not None
+
                 other_group_path = other_pin_tag.get("path")
                 assert other_group_path is not None
 
@@ -79,6 +87,7 @@ def _parse_group(
 
                 other_pin_id = GlobalGroupPinIdentifier((
                     GroupIdentifier((
+                        Schematic(other_group_schematic),
                         GroupPath(other_group_path),
                         GroupType(other_group_type),
                     )),
@@ -116,6 +125,10 @@ def _parse_xml_root(path: Path) -> Tuple[ET.Element, Path, datetime, str]:
 
 
 def _parse_group_node(node_tag: ET.Element) -> GlobalGroupPinIdentifier:
+    raw_schematic = node_tag.get("schematic")
+    assert raw_schematic is not None
+    schematic = Schematic(raw_schematic)
+
     raw_path = node_tag.get("path")
     assert raw_path is not None
     path = GroupPath(raw_path)
@@ -129,7 +142,7 @@ def _parse_group_node(node_tag: ET.Element) -> GlobalGroupPinIdentifier:
     pin = GroupPinName(raw_pin)
 
     return GlobalGroupPinIdentifier((
-        GroupIdentifier((path, type_name)),
+        GroupIdentifier((schematic, path, type_name)),
         pin,
     ))
 

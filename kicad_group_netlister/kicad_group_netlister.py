@@ -60,10 +60,11 @@ def _group_components_by_group(
             continue
         group_type = GroupType(component.fields[GROUP_TYPE_FIELD_NAME])
         group_path = GroupPath(component.sheetpath)
-        group_identifier = GroupIdentifier((group_path, group_type))
+        group_identifier = GroupIdentifier((netlist.schematic, group_path, group_type))
 
         if group_identifier not in groups:
             groups[group_identifier] = RawGroup()
+            groups[group_identifier].schematic = netlist.schematic
             groups[group_identifier].path = group_path
             groups[group_identifier].type_name = group_type
             groups[group_identifier].components = {component}
@@ -173,6 +174,7 @@ def _gen_group_netlist(
     groups_lookup: Dict[GroupIdentifier, Group] = dict()
     for raw_group in raw_groups_lookup.values():
         group = Group()
+        group.schematic = raw_group.schematic
         group.path = raw_group.path
         group.type_name = raw_group.type_name
         group.group_map_fields = raw_group.group_map_fields

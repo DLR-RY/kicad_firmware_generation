@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 from typing import Dict, FrozenSet, List, NewType, Set, Tuple
 
+Schematic = NewType("Schematic", str)
 """
 The path's nodes are separated with `/`.
 There must be a leading slash and no trailing slash.
@@ -13,7 +14,7 @@ There must be a leading slash and no trailing slash.
 GroupPath = NewType("GroupPath", str)
 GroupPathNode = NewType("GroupPathNode", str)
 GroupType = NewType("GroupType", str)
-GroupIdentifier = NewType("GroupIdentifier", Tuple[GroupPath, GroupType])
+GroupIdentifier = NewType("GroupIdentifier", Tuple[Schematic, GroupPath, GroupType])
 GroupPinName = NewType("GroupPinName", str)
 
 GlobalGroupPinIdentifier = NewType(
@@ -29,12 +30,14 @@ GroupGlob = NewType("GroupGlob", re.Pattern[str])
 
 
 class Group:
+    schematic: Schematic
     path: GroupPath
     type_name: GroupType
     """
     Map key to value.
     """
     group_map_fields: Dict[str, str]
+    # TODO: remove one-to-many map
     """
     If we are generating a one-to-many map (OtherGroupPinType.ONE_TO_MANY), map group pin name to connected root group pin name.
     If this is the root group the value is always None.
@@ -44,7 +47,7 @@ class Group:
     pins: Dict[GroupPinName, GroupPinName | None | Set[GlobalGroupPinIdentifier]]
 
     def get_id(self) -> GroupIdentifier:
-        return GroupIdentifier((self.path, self.type_name))
+        return GroupIdentifier((self.schematic, self.path, self.type_name))
 
     def _get_pins_to_glob(
         self, glob_str: str
@@ -148,7 +151,13 @@ class GroupNetlist:
 
 
 def stringify_group_id(id: GroupIdentifier) -> str:
-    return f"{id[0]}{id[1]}"
+    """
+    The stringified group id resembles a path uniquely identifying this group.
+    The stringified group id has no leading slash and no trailing slash.
+    It consists of the source schematic, the group path and group type.
+    There are no double slashes between the path nodes.
+    """
+    return f"{id[0]}{id[1]}{id[2]}"
 
 
 def split_group_path(path: GroupPath) -> List[GroupPathNode]:

@@ -11,7 +11,7 @@ from common_types.group_types import stringify_group_id
 # TODO: set this properly
 TOOL_NAME = "group_many_to_many_map_to_csv v0.1.0"
 
-sort_key_pattern = re.compile(r"[^A-Za-z](\d+)")
+sort_key_pattern = re.compile(r"(\d+)")
 
 
 def _get_sort_key(name: str) -> Tuple[int, str]:
@@ -37,7 +37,7 @@ def main() -> None:
         sys.stdout,
         delimiter=",",
         quotechar='"',
-        fieldnames=["group_path", "group_type", "pin_name", "other_pins"],
+        fieldnames=["schematic", "group_path", "group_type", "pin_name", "other_pins"],
         quoting=csv.QUOTE_MINIMAL,
     )
     csv_writer.writeheader()
@@ -56,6 +56,7 @@ def main() -> None:
                 for other_group_id, other_pin in other_pins_list
             ])
             csv_writer.writerow({
+                "schematic": group.schematic,
                 "group_path": group.path,
                 "group_type": group.type_name,
                 "pin_name": pin_name,

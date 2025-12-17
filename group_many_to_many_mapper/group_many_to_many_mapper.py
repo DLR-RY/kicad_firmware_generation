@@ -15,6 +15,7 @@ from common_types.group_types import (
     GroupPinName,
     GroupType,
     GroupGlob,
+    Schematic,
     does_match_pattern,
     compile_group_glob,
 )
@@ -78,6 +79,7 @@ def _gen_many_to_many_group_map(
                     GlobalGroupPinIdentifier((
                         GroupIdentifier((
                             # TODO: do this better
+                            Schematic("This_was"),
                             GroupPath("/Simplified/"),
                             GroupType("Away"),
                         )),

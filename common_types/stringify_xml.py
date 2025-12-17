@@ -20,6 +20,7 @@ def _xmlify_group(
     tag_name: str,
 ) -> ET.Element:
     root = ET.Element(tag_name)
+    root.set("schematic", group.schematic)
     root.set("path", group.path)
     root.set("type", group.type_name)
 
@@ -44,8 +45,9 @@ def _xmlify_group(
             other_pins.sort()
             for other_pin in other_pins:
                 xml_other_pin = ET.SubElement(pin, "otherPin")
-                xml_other_pin.set("path", other_pin[0][0])
-                xml_other_pin.set("type", other_pin[0][1])
+                xml_other_pin.set("schematic", other_pin[0][0])
+                xml_other_pin.set("path", other_pin[0][1])
+                xml_other_pin.set("type", other_pin[0][2])
                 xml_other_pin.set("pin", other_pin[1])
         elif other_group_pin_type == OtherGroupPinType.ONE_TO_MANY:
             root_group_pin = pin_connection
@@ -81,8 +83,9 @@ def _xmlify_net(net: GroupNet, tag_name: str) -> ET.Element:
     nodes.sort()
     for node in nodes:
         xml_node = ET.SubElement(xml_net, "node")
-        xml_node.set("path", node[0][0])
-        xml_node.set("type", node[0][1])
+        xml_node.set("schematic", node[0][0])
+        xml_node.set("path", node[0][1])
+        xml_node.set("type", node[0][2])
         xml_node.set("pin", node[1])
     return xml_net
 
