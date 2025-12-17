@@ -116,7 +116,7 @@ class OtherGroupPinType(Enum):
 class GroupMap:
     map_type: OtherGroupPinType
 
-    source: Path
+    sources: Set[Path]
     date: datetime
     tool: str
 
@@ -128,7 +128,7 @@ class GroupMap:
 
     def __repr__(self) -> str:
         return (
-            f"GroupMap(source={self.source!r}, date={self.date.isoformat()}, "
+            f"GroupMap(source={self.sources!r}, date={self.date.isoformat()}, "
             f"tool={self.tool!r}, root_group={None if self.root_group is None else stringify_group_id(self.root_group.get_id())!r}, "
             f"groups={len(self.groups)})"
         )
@@ -139,7 +139,7 @@ class GroupNetlist:
     Represent what groups there are and how they are connected.
     """
 
-    source: Path
+    sources: Set[Path]
     date: datetime
     tool: str
 

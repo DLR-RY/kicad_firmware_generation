@@ -33,7 +33,7 @@ def _gen_many_to_many_group_map(
     # general metadata
     group_map = GroupMap()
     group_map.map_type = OtherGroupPinType.MANY_TO_MANY
-    group_map.source = netlist.source
+    group_map.sources = netlist.sources
     group_map.date = datetime.now()
     group_map.tool = TOOL_NAME
     group_map.root_group = None

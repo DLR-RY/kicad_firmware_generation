@@ -1,14 +1,14 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import List, Set
 
 from common_types.group_types import (
+    GroupNetlist,
     OtherGroupPinType,
     Group,
     GroupMap,
     GroupNet,
-    GroupNetlist,
 )
 
 XML_WARNING = "WARNING: This file has been automatically generated. Do not edit!"
@@ -101,15 +101,18 @@ def _xmlify_nets(nets: List[GroupNet], tag_name: str) -> ET.Element:
 
 
 def _create_xml_root(
-    source: Path, date: datetime, tool: str, tag_name: str
+    sources: Set[Path], date: datetime, tool: str, tag_name: str
 ) -> ET.Element:
     root = ET.Element(tag_name)
     warning_comment = ET.Comment(XML_WARNING)
     root.append(warning_comment)
 
     netlist = ET.SubElement(root, "netlist")
-    source_tag = ET.SubElement(netlist, "source")
-    source_tag.text = str(source)
+    sources_tag = ET.SubElement(netlist, "sources")
+    for source in sources:
+        source_tag = ET.SubElement(sources_tag, "source")
+        source_tag.text = str(source)
+
     date_tag = ET.SubElement(netlist, "date")
     date_tag.text = date.isoformat()
     tool_tag = ET.SubElement(netlist, "tool")
@@ -127,7 +130,7 @@ def _stringify_xml(element: ET.Element) -> bytes:
 
 def stringify_group_netlist(group_netlist: GroupNetlist) -> bytes:
     root = _create_xml_root(
-        group_netlist.source,
+        group_netlist.sources,
         group_netlist.date,
         group_netlist.tool,
         "groupNetlist",
@@ -145,7 +148,7 @@ def stringify_group_netlist(group_netlist: GroupNetlist) -> bytes:
 
 def stringify_group_map(group_map: GroupMap) -> bytes:
     root = _create_xml_root(
-        group_map.source, group_map.date, group_map.tool, "groupMap"
+        group_map.sources, group_map.date, group_map.tool, "groupMap"
     )
     if group_map.map_type == OtherGroupPinType.ONE_TO_MANY:
         assert group_map.root_group is not None

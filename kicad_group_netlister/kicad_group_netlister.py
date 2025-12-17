@@ -1,3 +1,4 @@
+import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -5,28 +6,30 @@ from typing import Dict, Set, Tuple
 
 from common_types.group_types import (
     GlobalGroupPinIdentifier,
-    MutableGroupNet,
     Group,
+    GroupGlob,
     GroupIdentifier,
     GroupNet,
     GroupNetlist,
     GroupPath,
     GroupPinName,
     GroupType,
+    MutableGroupNet,
+    compile_group_glob,
     stringify_group_id,
 )
 from common_types.stringify_xml import stringify_group_netlist
 from kicad_group_netlister.kicad_netlist_xml import parse_kicad_netlist
 from kicad_group_netlister.kicad_types import (
     GlobalKiCadPinIdentifier,
+    GroupPinNameLookups,
+    GroupsReverseLookup,
     KiCadComponentRef,
     KiCadNetlist,
     KiCadNodePinName,
     KiCadSheetPath,
     RawGroup,
     RawGroupLookup,
-    GroupPinNameLookups,
-    GroupsReverseLookup,
 )
 
 GROUP_TYPE_FIELD_NAME = "GroupType"
@@ -165,7 +168,7 @@ def _gen_group_netlist(
     )
 
     group_netlist = GroupNetlist()
-    group_netlist.source = netlist.source
+    group_netlist.sources = {netlist.source}
     group_netlist.date = datetime.now()
     group_netlist.tool = TOOL_NAME
 
@@ -292,23 +295,72 @@ def _check_kicad_netlist_structure(netlist: KiCadNetlist) -> None:
             sys.exit(1)
 
 
+def _merge_group_netlists(netlists: Set[GroupNetlist]) -> GroupNetlist:
+    netlists_list = list(netlists)
+    assert len(netlists_list) > 0
+    netlist = netlists_list[0]
+    for new_netlist in netlists_list[1:]:
+        for source in netlist.sources:
+            assert source not in new_netlist.sources
+        netlist.sources |= new_netlist.sources
+        for group_id in netlist.groups.keys():
+            assert group_id not in new_netlist.groups
+        netlist.groups |= new_netlist.groups
+        for net in netlist.nets:
+            assert net not in new_netlist.nets
+        netlist.nets |= new_netlist.nets
+    return netlist
+
+
+def _connect_netlist(
+    netlist: GroupNetlist, connect_group_globs: Set[GroupGlob]
+) -> GroupNetlist:
+    return netlist
+
+
 def main() -> None:
-    if len(sys.argv) != 2:
-        print(
-            "Error: Provide one argument: the input KiCad netlist file (in the kicadxml format) path.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    kicad_netlist_path = Path(sys.argv[1])
-    kicad_netlist = parse_kicad_netlist(kicad_netlist_path)
-    _check_kicad_netlist_structure(kicad_netlist)
-
-    groups_lookup, groups_reverse_lookup = _group_components_by_group(kicad_netlist)
-
-    group_netlist = _gen_group_netlist(
-        kicad_netlist, groups_lookup, groups_reverse_lookup
+    parser = argparse.ArgumentParser(
+        prog=TOOL_NAME,
+        description="Convert a KiCad Netlist into a Group Netlist.",
     )
-    sys.stdout.buffer.write(stringify_group_netlist(group_netlist))
+    parser.add_argument(
+        "kicad_netlist_file",
+        help="The path to a KiCad Netlist files (in the kicadxml format). "
+        "You may provide multiple.",
+        nargs="+",
+    )
+    parser.add_argument(
+        "--connect-group-glob",
+        help="All groups that match this glob are merged into a single one. "
+        "All groups that match must have exactly the same pins. "
+        "All matching groups are connected together. "
+        "This reflects the use of a physical connector, connecting multiple schematics together. "
+        "You may provide multiple.",
+        nargs="*",
+    )
+    args = parser.parse_args()
+    kicad_netlist_paths = {Path(path) for path in args.kicad_netlist_file}
+
+    group_schematic_netlists: Set[GroupNetlist] = set()
+
+    for kicad_netlist_path in kicad_netlist_paths:
+        kicad_netlist = parse_kicad_netlist(kicad_netlist_path)
+        _check_kicad_netlist_structure(kicad_netlist)
+
+        groups_lookup, groups_reverse_lookup = _group_components_by_group(kicad_netlist)
+
+        group_schematic_netlists.add(
+            _gen_group_netlist(kicad_netlist, groups_lookup, groups_reverse_lookup)
+        )
+
+    merged_group_netlist = _merge_group_netlists(
+        group_schematic_netlists,
+    )
+    connected_merged_group_netlist = _connect_netlist(
+        merged_group_netlist,
+        {compile_group_glob(group_glob) for group_glob in args.connect_group_glob},
+    )
+    sys.stdout.buffer.write(stringify_group_netlist(connected_merged_group_netlist))
 
 
 if __name__ == "__main__":

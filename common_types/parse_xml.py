@@ -6,12 +6,12 @@ from typing import Set, Tuple
 
 from common_types.group_types import (
     GlobalGroupPinIdentifier,
+    GroupNetlist,
     OtherGroupPinType,
     Group,
     GroupIdentifier,
     GroupMap,
     GroupNet,
-    GroupNetlist,
     GroupPath,
     GroupPinName,
     GroupType,
@@ -99,17 +99,20 @@ def _parse_group(
     return group
 
 
-def _parse_xml_root(path: Path) -> Tuple[ET.Element, Path, datetime, str]:
+def _parse_xml_root(path: Path) -> Tuple[ET.Element, Set[Path], datetime, str]:
     """
     Return root element, source, date and tool.
     """
     tree = ET.parse(path)
     root = tree.getroot()
 
-    source_tags = root.findall("./netlist/source")
-    assert len(source_tags) == 1
-    assert source_tags[0].text is not None
-    source = Path(source_tags[0].text)
+    source_tags = root.findall("./netlist/sources/source")
+    assert len(source_tags) > 0
+    sources: Set[Path] = set()
+    for source_tag in source_tags:
+        assert source_tag.text is not None
+        assert source_tag.text not in sources
+        sources.add(Path(source_tag.text))
 
     date_tags = root.findall("./netlist/date")
     assert len(date_tags) == 1
@@ -121,7 +124,7 @@ def _parse_xml_root(path: Path) -> Tuple[ET.Element, Path, datetime, str]:
     assert tool_tags[0].text is not None
     tool = tool_tags[0].text
 
-    return root, source, date, tool
+    return root, sources, date, tool
 
 
 def _parse_group_node(node_tag: ET.Element) -> GlobalGroupPinIdentifier:
@@ -154,7 +157,7 @@ def _parse_group_net(net_tag: ET.Element) -> GroupNet:
 
 def parse_group_netlist(group_netlist_path: Path) -> GroupNetlist:
     group_netlist = GroupNetlist()
-    root, group_netlist.source, group_netlist.date, group_netlist.tool = (
+    root, group_netlist.sources, group_netlist.date, group_netlist.tool = (
         _parse_xml_root(group_netlist_path)
     )
 
@@ -184,7 +187,7 @@ def parse_group_netlist(group_netlist_path: Path) -> GroupNetlist:
 def parse_one_to_many_group_map(group_map_path: Path) -> GroupMap:
     group_map = GroupMap()
     group_map.map_type = OtherGroupPinType.ONE_TO_MANY
-    root, group_map.source, group_map.date, group_map.tool = _parse_xml_root(
+    root, group_map.sources, group_map.date, group_map.tool = _parse_xml_root(
         group_map_path
     )
 
@@ -214,7 +217,7 @@ def parse_one_to_many_group_map(group_map_path: Path) -> GroupMap:
 def parse_many_to_many_group_map(group_map_path: Path) -> GroupMap:
     group_map = GroupMap()
     group_map.map_type = OtherGroupPinType.MANY_TO_MANY
-    root, group_map.source, group_map.date, group_map.tool = _parse_xml_root(
+    root, group_map.sources, group_map.date, group_map.tool = _parse_xml_root(
         group_map_path
     )
     group_map.root_group = None
