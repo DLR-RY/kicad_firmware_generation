@@ -126,6 +126,7 @@ class GroupMap:
     root_group: Group | None
     groups: Set[Group]
 
+    # TODO: better __repr__ functions everywhere.
     def __repr__(self) -> str:
         return (
             f"GroupMap(source={self.sources!r}, date={self.date.isoformat()}, "

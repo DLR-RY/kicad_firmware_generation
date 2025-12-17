@@ -23,7 +23,8 @@ def _get_sort_key(name: str) -> Tuple[int, str]:
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
-        description="Convert a many-to-many group map to a csv.",
+        description="Convert a many-to-many group map to a csv. "
+        "The output is printed to stdout, errors and warnings to stderr.",
     )
     parser.add_argument(
         "group_many_to_many_map", help="The path to the group_many_to_many_map."

@@ -1,14 +1,12 @@
 import argparse
-from collections import deque
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, FrozenSet, Set, Tuple
+from typing import Dict, Set, Tuple
 
 from common_types.group_types import (
     GlobalGroupPinIdentifier,
     Group,
-    GroupGlob,
     GroupIdentifier,
     GroupNet,
     GroupNetlist,
@@ -16,8 +14,6 @@ from common_types.group_types import (
     GroupPinName,
     GroupType,
     MutableGroupNet,
-    compile_group_glob,
-    does_match_pattern,
     stringify_group_id,
 )
 from common_types.stringify_xml import stringify_group_netlist
@@ -237,7 +233,9 @@ def _gen_group_netlist(
 
             # This might very well be the only pin in the group net.
             group_net.add(global_group_pin_identifier)
-        group_netlist.nets.add(GroupNet(frozenset(group_net)))
+        # We don't want to add empty nets.
+        if group_net:
+            group_netlist.nets.add(GroupNet(frozenset(group_net)))
 
     group_netlist.groups = groups_lookup
 
@@ -297,225 +295,26 @@ def _check_kicad_netlist_structure(netlist: KiCadNetlist) -> None:
             sys.exit(1)
 
 
-# TODO: maybe break this into a separate tool.
-# TODO: This doesn't have anything to do with kicad.
-def _merge_group_netlists(netlists: Set[GroupNetlist]) -> GroupNetlist:
-    netlists_list = list(netlists)
-    assert len(netlists_list) > 0
-    netlist = netlists_list[0]
-    for new_netlist in netlists_list[1:]:
-        for source in netlist.sources:
-            assert source not in new_netlist.sources
-        netlist.sources |= new_netlist.sources
-        for group_id in netlist.groups.keys():
-            assert group_id not in new_netlist.groups
-        netlist.groups |= new_netlist.groups
-        for net in netlist.nets:
-            assert net not in new_netlist.nets
-        netlist.nets |= new_netlist.nets
-    return netlist
-
-
-# TODO: maybe break this into a separate tool.
-# TODO: This doesn't have anything to do with kicad.
-def _connect_netlist(
-    netlist: GroupNetlist, connect_group_globs: Set[GroupGlob]
-) -> GroupNetlist:
-    # For each group glob figure out what groups it matches.
-    to_connect_group_sets: Set[FrozenSet[GroupIdentifier]] = set()
-    for connect_group_glob in connect_group_globs:
-        to_connect_group_set: Set[GroupIdentifier] = set()
-        for group_id in netlist.groups:
-            if not does_match_pattern(connect_group_glob, group_id):
-                continue
-            # Ensure we only connect groups that can be connected.
-            if len(to_connect_group_set) != 0:
-                group = netlist.groups[group_id]
-                other_group = netlist.groups[list(to_connect_group_set)[0]]
-                if set(other_group.pins.keys()) != set(group.pins.keys()):
-                    print(
-                        f"Error: The connect group glob pattern {connect_group_glob} matches both {stringify_group_id(group.get_id())} and {stringify_group_id(other_group.get_id())} but they don't have the same pins.",
-                        file=sys.stderr,
-                    )
-                    sys.exit(1)
-            to_connect_group_set.add(group_id)
-
-        print(f"Merging groups: {to_connect_group_set}", file=sys.stderr)
-        if len(to_connect_group_set) < 2:
-            print(
-                f"Warning: The connect group glob pattern {connect_group_glob} matches fewer than two groups: {to_connect_group_set}.",
-                file=sys.stderr,
-            )
-        to_connect_group_sets.add(frozenset(to_connect_group_set))
-
-    # This relation should be transitive but isn't.
-    # We implement the transitive nature further down.
-    def should_nets_be_merged(net_a: GroupNet, net_b: GroupNet) -> bool:
-        if net_a == net_b:
-            return True
-        # All groups that are in net_a.
-        net_a_groups = {node[0] for node in net_a}
-        # All groups that are in net_b.
-        net_b_groups = {node[0] for node in net_a}
-        for group_set in to_connect_group_sets:
-            if len(net_a_groups & group_set) == 0:
-                # No group that matches this glob is connected to net_a.
-                continue
-            if len(net_b_groups & group_set) == 0:
-                # No group that matches this glob is connected to net_b.
-                continue
-            # if "PO_PROTECTED_NONE" in {
-            #     node[1] for node in net_a
-            # } and "PO_PROTECTED_NONE" in {node[1] for node in net_b}:
-            #     print(
-            #         f"{set({node for node in net_a if node[0] in group_set})}, {set({node for node in net_b if node[0] in group_set})} should maybe be merged.",
-            #         file=sys.stderr,
-            #     )
-            #     # print(
-            #     #     f"{net_a}, {net_b} should maybe be merged.",
-            #     #     file=sys.stderr,
-            #     # )
-            # So there are a few groups that are in net_a and to be connected.
-            # What pins of those groups are connected to this net?
-            net_a_pins = {node[1] for node in net_a if (node[0] in group_set)}
-            net_b_pins = {node[1] for node in net_b if (node[0] in group_set)}
-            # if (
-            #     net_a_pins
-            #     and net_b_pins
-            #     and "PO_PROTECTED_NONE" in net_a_pins
-            #     or "PO_PROTECTED_NONE" in net_b_pins
-            # ):
-            # print(
-            #     f"{net_a_group_intersection}, {net_b_group_intersection} should maybe be merged.",
-            #     file=sys.stderr,
-            # )
-            # print(
-            #     f"{net_a}|{net_b}",
-            #     file=sys.stderr,
-            # )
-            # print(
-            #     f"{net_a_pins}{net_b_pins} should maybe be merged.",
-            #     file=sys.stderr,
-            # )
-            # If the same pin is present in both nets and the groups those pins belong to, should be connected, the pins should be connected (i.e., the nets should be connected).
-            if len(net_a_pins & net_b_pins) != 0:
-                print(f"{net_a}, {net_b} should be merged.", file=sys.stderr)
-                return True
-        return False
-
-    # for net_a in netlist.nets:
-    #     for net_b in netlist.nets:
-    #         if net_a == net_b:
-    #             continue
-    #         if should_nets_be_merged(net_a, net_b):
-    #             print(f"HIT: {net_a}{net_b}", file=sys.stderr)
-
-    out_nets: Set[GroupNet] = set()
-    for net in netlist.nets:
-        unioned = False
-        # Should this net be unioned instead of appended?
-        for out_net in out_nets:
-            assert should_nets_be_merged(net, out_net) == should_nets_be_merged(
-                out_net, net
-            )
-            if should_nets_be_merged(net, out_net):
-                print(f"Merging nets: {net} {out_net}", file=sys.stderr)
-                # Update the old net with the new nodes.
-                out_nets.remove(out_net)
-                out_net |= net
-                out_nets.add(GroupNet(out_net))
-                unioned = True
-                break
-        if not unioned:
-            out_nets.add(net)
-
-    # We perform a breadth-first-search to implement the transitive relation.
-    # while True:
-    #     if len(netlist.nets) == 0:
-    #         break
-
-    #     net = netlist.nets.pop()
-    #     # Nets to walk over later.
-    #     found: deque[GroupNet] = deque()
-    #     found.append(net)
-    #     # All the nets that should be merged with net.
-    #     nets_to_merge: Set[GroupNet] = set()
-    #     while True:
-    #         if len(found) == 0:
-    #             break
-    #         net = found.popleft()
-    #         # Because we delete all nets that we've found from the original netlist.nets set this should never happen.
-    #         # We never walk backwards.
-    #         if net in nets_to_merge:
-    #             assert False
-    #             # continue
-    #         nets_to_merge.add(net)
-    #         to_connect_with_nets = {
-    #             other_net
-    #             for other_net in netlist.nets
-    #             if should_nets_be_merged(net, other_net)
-    #         }
-    #         # We only want nets to be seen once.
-    #         netlist.nets -= to_connect_with_nets
-    #         found += to_connect_with_nets
-    #     # Merge the nets to be merged.
-    #     assert len(nets_to_merge) != 0
-    #     merged_group_net: Set[GlobalGroupPinIdentifier] = set()
-    #     if len(nets_to_merge) > 1:
-    #         print(f"Merging nets: {nets_to_merge}", file=sys.stderr)
-    #     for net in nets_to_merge:
-    #         merged_group_net |= net
-    #     out_nets.add(GroupNet(frozenset(merged_group_net)))
-
-    netlist.nets = out_nets
-    return netlist
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
-        description="Convert a KiCad Netlist into a Group Netlist.",
+        description="Convert a KiCad Netlist into a Group Netlist. "
+        "The output is printed to stdout, errors and warnings to stderr.",
     )
     parser.add_argument(
         "kicad_netlist_file",
-        help="The path to a KiCad Netlist files (in the kicadxml format). "
-        "You may provide multiple.",
-        nargs="+",
-    )
-    parser.add_argument(
-        "--connect-group-glob",
-        help="All groups that match this glob are merged into a single one. "
-        "All groups that match must have exactly the same pins. "
-        "All matching groups are connected together. "
-        "This reflects the use of a physical connector, connecting multiple schematics together. "
-        "You may provide multiple.",
-        action="append",
+        help="The path to a KiCad Netlist files (in the kicadxml format).",
     )
     args = parser.parse_args()
-    kicad_netlist_paths = {Path(path) for path in args.kicad_netlist_file}
+    kicad_netlist_path = Path(args.kicad_netlist_file)
 
-    group_schematic_netlists: Set[GroupNetlist] = set()
+    kicad_netlist = parse_kicad_netlist(kicad_netlist_path)
+    _check_kicad_netlist_structure(kicad_netlist)
 
-    for kicad_netlist_path in kicad_netlist_paths:
-        kicad_netlist = parse_kicad_netlist(kicad_netlist_path)
-        _check_kicad_netlist_structure(kicad_netlist)
+    groups_lookup, groups_reverse_lookup = _group_components_by_group(kicad_netlist)
+    netlist = _gen_group_netlist(kicad_netlist, groups_lookup, groups_reverse_lookup)
 
-        groups_lookup, groups_reverse_lookup = _group_components_by_group(kicad_netlist)
-
-        group_schematic_netlists.add(
-            _gen_group_netlist(kicad_netlist, groups_lookup, groups_reverse_lookup)
-        )
-
-    merged_group_netlist = _merge_group_netlists(
-        group_schematic_netlists,
-    )
-    connected_merged_group_netlist = _connect_netlist(
-        merged_group_netlist,
-        set()
-        if args.connect_group_glob is None
-        else {compile_group_glob(group_glob) for group_glob in args.connect_group_glob},
-    )
-    sys.stdout.buffer.write(stringify_group_netlist(connected_merged_group_netlist))
+    sys.stdout.buffer.write(stringify_group_netlist(netlist))
 
 
 if __name__ == "__main__":

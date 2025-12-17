@@ -142,6 +142,7 @@ def stringify_group_netlist(group_netlist: GroupNetlist) -> bytes:
             "groups",
         )
     )
+    assert GroupNet(frozenset()) not in group_netlist.nets
     root.append(_xmlify_nets(list(group_netlist.nets), "nets"))
     return _stringify_xml(root)
 

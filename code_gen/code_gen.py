@@ -37,6 +37,7 @@ def _camel_case(in_str: str) -> str:
     return _change_case(in_str, False)
 
 
+# TODO: use argparse
 def main() -> None:
     if len(sys.argv) != 3 and len(sys.argv) != 4:
         print(

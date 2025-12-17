@@ -98,7 +98,8 @@ def _gen_many_to_many_group_map(
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
-        description="Generate an overview over every group consisting of what all the group's pins are connected to.",
+        description="Generate an overview over every group consisting of what all the group's pins are connected to. "
+        "The output is printed to stdout, errors and warnings to stderr.",
     )
     parser.add_argument("group_netlist_input", help="The path to the group_netlist.")
     parser.add_argument(

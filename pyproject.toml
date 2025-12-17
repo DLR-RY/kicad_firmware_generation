@@ -23,10 +23,11 @@ license-files = ["LICENSE"]
 keywords = []
 
 [tool.setuptools]
-packages = ["kicad_group_netlister", "group_many_to_many_mapper", "code_gen", "common_types", "map_to_csv"]
+packages = ["kicad_group_netlister", "group_many_to_many_mapper", "code_gen", "common_types", "map_to_csv", "group_netlist_merger"]
 
 [project.scripts]
 kicad_group_netlister = "kicad_group_netlister.kicad_group_netlister:main"
 group_many_to_many_mapper = "group_many_to_many_mapper.group_many_to_many_mapper:main"
 code_gen = "code_gen.code_gen:main"
 map_to_csv = "map_to_csv.map_to_csv:main"
+group_netlist_merger = "group_netlist_merger.group_netlist_merger:main"
