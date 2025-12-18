@@ -119,6 +119,10 @@ def _connect_netlist(
                     if node_b[0] not in group_set:
                         # The node is not of a group that should be connected.
                         continue
+                    if node_a[0] == node_b[0]:
+                        # Do not connect a group to itself.
+                        # This would be a problem with even_odd pin mapping.
+                        continue
                     if not should_pins_connect(node_b[1], node_a[1]):
                         # The pins of node_a and node_b aren't the same -> don't connect.
                         continue
