@@ -74,7 +74,7 @@ def _connect_netlist(
             )
         to_connect_group_sets.add(frozenset(to_connect_group_set))
 
-    def matches_pins(pin_a: GroupPinName, pin_b: GroupPinName) -> bool:
+    def should_pins_connect(pin_a: GroupPinName, pin_b: GroupPinName) -> bool:
         match pin_mapper:
             case PinMapper.equal:
                 return pin_a == pin_b
@@ -119,7 +119,7 @@ def _connect_netlist(
                     if node_b[0] not in group_set:
                         # The node is not of a group that should be connected.
                         continue
-                    if matches_pins(node_b[1], node_a[1]):
+                    if not should_pins_connect(node_b[1], node_a[1]):
                         # The pins of node_a and node_b aren't the same -> don't connect.
                         continue
                     return True

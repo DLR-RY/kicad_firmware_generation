@@ -1,4 +1,5 @@
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from pathlib import Path
@@ -176,42 +177,15 @@ def parse_group_netlist(group_netlist_path: Path) -> GroupNetlist:
     with open(group_netlist_path, "rb") as group_netlist_file:
         check_group_netlist = stringify_group_netlist(group_netlist)
         if check_group_netlist != group_netlist_file.read():
-            print(
-                "Warning: The group netlist was created with a different stringify algorithm or is buggy.",
-                file=sys.stderr,
-            )
+            with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                tmp.write(check_group_netlist)
+                print(
+                    "Warning: The group netlist was created with a different stringify algorithm or is buggy. "
+                    f"The parsed and then stringified file is in: {tmp.name}",
+                    file=sys.stderr,
+                )
 
     return group_netlist
-
-
-def parse_one_to_many_group_map(group_map_path: Path) -> GroupMap:
-    group_map = GroupMap()
-    group_map.map_type = OtherGroupPinType.ONE_TO_MANY
-    root, group_map.sources, group_map.date, group_map.tool = _parse_xml_root(
-        group_map_path
-    )
-
-    root_group_tags = root.findall("./rootGroup")
-    assert len(root_group_tags) == 1
-    group_map.root_group = _parse_group(
-        root_group_tags[0], OtherGroupPinType.ONE_TO_MANY
-    )
-
-    connected_groups = root.findall("./groups/group")
-    group_map.groups = {
-        _parse_group(group, OtherGroupPinType.ONE_TO_MANY) for group in connected_groups
-    }
-
-    # Check that stringifying what we parsed gets us back.
-    with open(group_map_path, "rb") as group_map_file:
-        check_group_map = stringify_group_map(group_map)
-        if check_group_map != group_map_file.read():
-            print(
-                "Warning: The one-to-many group map was created with a different stringify algorithm or is buggy.",
-                file=sys.stderr,
-            )
-
-    return group_map
 
 
 def parse_many_to_many_group_map(group_map_path: Path) -> GroupMap:
@@ -234,9 +208,13 @@ def parse_many_to_many_group_map(group_map_path: Path) -> GroupMap:
     with open(group_map_path, "rb") as group_map_file:
         check_group_map = stringify_group_map(group_map)
         if check_group_map != group_map_file.read():
-            print(
-                "Warning: The many-to-many group map was created with a different stringify algorithm or is buggy.",
-                file=sys.stderr,
-            )
+            # TODO: maybe reduce code duplication
+            with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                tmp.write(check_group_map)
+                print(
+                    "Warning: The many-to-many map was created with a different stringify algorithm or is buggy. "
+                    f"The parsed and then stringified file is in: {tmp.name}",
+                    file=sys.stderr,
+                )
 
     return group_map

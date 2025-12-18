@@ -109,7 +109,9 @@ def _create_xml_root(
 
     netlist = ET.SubElement(root, "netlist")
     sources_tag = ET.SubElement(netlist, "sources")
-    for source in sources:
+    sources_list = list(sources)
+    sources_list.sort()
+    for source in sources_list:
         source_tag = ET.SubElement(sources_tag, "source")
         source_tag.text = str(source)
 
