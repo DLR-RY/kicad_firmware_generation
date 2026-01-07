@@ -10,10 +10,11 @@ from common_types.group_types import (
     GroupIdentifier,
     GroupNet,
     GroupNetlist,
-    GroupPath,
     GroupPinName,
-    GroupType,
     MutableGroupNet,
+    assert_is_group_path,
+    assert_is_group_type,
+    assert_is_pin_name,
     stringify_group_id,
 )
 from common_types.stringify_xml import stringify_group_netlist
@@ -59,8 +60,8 @@ def _group_components_by_group(
 
             # This component is not part of any group.
             continue
-        group_type = GroupType(component.fields[GROUP_TYPE_FIELD_NAME])
-        group_path = GroupPath(component.sheetpath)
+        group_type = assert_is_group_type(component.fields[GROUP_TYPE_FIELD_NAME])
+        group_path = assert_is_group_path(component.sheetpath)
         group_identifier = GroupIdentifier(netlist.schematic, group_path, group_type)
 
         if group_identifier not in groups:
@@ -129,7 +130,7 @@ def _get_explicit_pin_name_lookups(
                     assert global_pin_identifier not in other_expicit_in_naming_group
 
                 # This is the name the user explicitly set for this pin.
-                group_pin_name = GroupPinName(field_value)
+                group_pin_name = assert_is_pin_name(field_value)
                 if group_pin_name in group_pin_names:
                     print(
                         f"Error: The GroupPin {group_pin_name} exists at least twice for the group {stringify_group_id(group_identifier)}.",
@@ -208,7 +209,7 @@ def _gen_group_netlist(
             else:
                 # When the user didn't define any GroupPin names for at all we use a fallback:
                 # We consider all pins that belong to components that belong to the group as pins of the group.
-                group_pin_name = GroupPinName(node.pinfunction)
+                group_pin_name = assert_is_pin_name(node.pinfunction)
 
             # Assign None because we represent connections using nets and not other pins in the groups.
             groups_lookup[group_identifier].pins.add(group_pin_name)

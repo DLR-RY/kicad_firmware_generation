@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Set
 
-from common_types.group_types import Schematic
+from common_types.group_types import assert_is_schematic
 from kicad_group_netlister.kicad_types import (
     KiCadComponent,
     KiCadComponentRef,
@@ -27,7 +27,7 @@ def parse_kicad_netlist(netlist_path: Path) -> KiCadNetlist:
     assert source_tags[0].text is not None
     netlist.source = Path(source_tags[0].text)
 
-    netlist.schematic = Schematic(netlist.source.name.rstrip(".kicad_sch"))
+    netlist.schematic = assert_is_schematic(netlist.source.name.rstrip(".kicad_sch"))
     assert "." not in netlist.schematic
     assert "/" not in netlist.schematic
 

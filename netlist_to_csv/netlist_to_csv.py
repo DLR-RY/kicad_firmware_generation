@@ -10,11 +10,12 @@ from common_types.group_types import (
     GroupGlob,
     GroupIdentifier,
     GroupNetlistWithConnections,
-    GroupPath,
     GroupPinName,
-    GroupType,
     GroupWithConnection,
-    Schematic,
+    assert_is_group_path,
+    assert_is_group_type,
+    assert_is_pin_name,
+    assert_is_schematic,
     compile_group_glob,
     connect_netlist,
     does_match_pattern,
@@ -62,9 +63,9 @@ def _simplify_nets(
                     GlobalGroupPinIdentifier(
                         GroupIdentifier(
                             # TODO: do this better
-                            Schematic("This_was"),
-                            GroupPath("/Simplified/"),
-                            GroupType("Away"),
+                            assert_is_schematic("This_was"),
+                            assert_is_group_path("/Simplified/"),
+                            assert_is_group_type("Away"),
                         ),
                         found_simplify_pin,
                     )
@@ -128,7 +129,7 @@ def main() -> None:
     group_netlist_path = Path(args.group_netlist_path)
 
     simplify_pins: Set[GroupPinName] = {
-        GroupPinName(pin)
+        assert_is_pin_name(pin)
         for pin in ([] if args.simplify_pins is None else args.simplify_pins.split(","))
     }
 

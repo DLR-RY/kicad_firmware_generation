@@ -252,3 +252,49 @@ def connect_netlist(netlist: GroupNetlist) -> GroupNetlistWithConnections:
                 != GlobalGroupPinIdentifier(group_identifier, group_pin_name)
             }
     return connected_netlist
+
+
+GROUP_PATH_PATTERN = re.compile(r"^/([a-zA-Z0-9_/\-\+ ]+/|)$")
+SCHEMATIC_PATTERN = re.compile(r"^[a-zA-Z0-9_\-\+ ]+$")
+GROUP_TYPE_PATTERN = SCHEMATIC_PATTERN
+PIN_NAME_PATTERN = SCHEMATIC_PATTERN
+
+
+def assert_is_group_path(in_str: str) -> GroupPath:
+    if GROUP_PATH_PATTERN.match(in_str) is None:
+        print(
+            f"Error: {in_str} is no valid GroupPath",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return GroupPath(in_str)
+
+
+def assert_is_schematic(in_str: str) -> Schematic:
+    if SCHEMATIC_PATTERN.match(in_str) is None:
+        print(
+            f"Error: {in_str} is no valid Schematic",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return Schematic(in_str)
+
+
+def assert_is_group_type(in_str: str) -> GroupType:
+    if GROUP_TYPE_PATTERN.match(in_str) is None:
+        print(
+            f"Error: {in_str} is no valid GroupPath",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return GroupType(in_str)
+
+
+def assert_is_pin_name(in_str: str) -> GroupPinName:
+    if PIN_NAME_PATTERN.match(in_str) is None:
+        print(
+            f"Error: {in_str} is no valid GroupPinName",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    return GroupPinName(in_str)
