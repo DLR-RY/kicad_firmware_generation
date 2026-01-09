@@ -103,7 +103,7 @@ def _group_components_by_group(
     return (groups, reverse_lookup)
 
 
-# Groups without a explicit naming don't appear in this dict.
+# Groups without an explicit naming don't appear in this dict.
 def _get_explicit_pin_name_lookups(
     groups_lookup: RawGroupLookup,
 ) -> GroupPinNameLookups:
@@ -285,7 +285,7 @@ def _check_kicad_netlist_structure(netlist: KiCadNetlist) -> None:
         if required_path not in sheet_paths:
             # TODO: read the schematics file directly and figure this out perfectly.
             print(
-                f"Warning: The the last node of sheet path {requiring_path} uses the character `/`. "
+                f"Warning: The last node of sheet path {requiring_path} uses the character `/`. "
                 "This is not allowed because then separating path nodes isn't possible. "
                 f"The script knows this because it didn't find {required_path}. ",
                 "You need to fix this as this should be an error! ",
@@ -304,7 +304,7 @@ def main() -> None:
     )
     parser.add_argument(
         "kicad_netlist_file",
-        help="The path to a KiCad Netlist files (in the kicadxml format).",
+        help="The path to a KiCad Netlist file (in the kicadxml format).",
     )
     args = parser.parse_args()
     kicad_netlist_path = Path(args.kicad_netlist_file)
