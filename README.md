@@ -63,7 +63,7 @@ Use the `--help` flag on any tool and check out the preprint thesis below for mo
 ```
 # Merge two Group Netlists.
 python3 -m group_netlist_merger.group_netlist_merger \
-    --connect-group-glob 'MyFirstSchematic/Group1,MyFirstSchematic/Group2' \
+    --connect-group-glob 'MyFirstSchematic/Group1,MySecondSchematic/Group2' \
     even_odd first_group_netlist.xml second_group_netlist > combined_group_netlist.xml
 ```
 We explain the arguments in the preprint below.
