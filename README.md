@@ -13,7 +13,7 @@ You only need to add annotations like these:
 ![KiCad annotations example](./annotations_example.png)
 
 There are four programs around the Group Netlist:
-1. kicad_group_netlister: Extract Information from your KiCad schematics and create a Group Netlist XML file.
+1. kicad_group_netlister: Extract Information from your KiCad schematics and create a Group Netlist XML file (see [example/group_netlist.xml](./example/group_netlist.xml)).
 2. code_gen: Take your Jinja2 template, hand it the information from the Group Netlist and generate your firmware or any other file:
     C++, Rust, HTML or Markdown Documentation or maybe even some SVG for your child to play with?
     The sky is the limit!
