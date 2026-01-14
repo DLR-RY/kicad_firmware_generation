@@ -8,7 +8,9 @@ What even is a single functionality the controller cares about?
 Typically a group of components perform a function the firmware controls.
 Therefore, kicad_firmware_generation thinks in **Group**s, each representing multiple components.
 Our **Group Netlist XML** file format stores this information of your KiCad schematic:
-What Groups are there and how are they connected?
+What Groups are there and how are they connected?<br />
+You only need to add annotations like these:
+![KiCad annotations example](./annotations_example.png)
 
 There are four programs around the Group Netlist:
 1. kicad_group_netlister: Extract Information from your KiCad schematics and create a Group Netlist XML file.
@@ -33,23 +35,27 @@ If you have a use-case we haven't yet come up with, that's a place to start.
 ### Quick Start
 Give every component of interest the `GroupType` field in KiCad and use `GroupPin1`, `GroupPin2`, ... to give every pin a name.
 Components with the same Group Type on the same sheet belong to the same Group.
-The Group will have all its components' pins with an associated `GroupPinx` field.
+The Group will have all its components' pins with an associated `GroupPinx` field.<br />
+Alternatively, use the example in the [example](./example) dir.
+Also, take a look at [example.kicad_pro](./example/schematics/example.kicad_pro).
+It contains some annotations.
+The below command work directly when you've entered the example dir.
 
-Create a KiCad Netlist.
+1. Create a KiCad Netlist.
 Replace `your_schematics.kicad_sch` with the path to your root schematics file.
 KiCad will read all components on subsheets, too.
 ```
-kicad-cli sch export netlist --format kicadxml --output kicad_netlist.xml your_schematics.kicad_sch
+kicad-cli sch export netlist --format kicadxml --output kicad_netlist.xml schematics/example.kicad_sch
 ```
 
-Convert into Group Netlist.
+2. Convert into Group Netlist.
 ```
-python3 -m kicad_group_netlister.kicad_group_netlister kicad_netlistb.xml > group_netlist.xml
+python3 -m kicad_group_netlister.kicad_group_netlister --lenient-names --output group_netlist.xml kicad_netlist.xml
 ```
 
-Generate Firmware from Jinja2 Template.
+3. Generate Firmware from Jinja2 Template.
 ```
-python3 -m code_gen.code_gen group_netlist.xml my_template.c.tmpl > output.c
+python3 -m code_gen.code_gen --output pindefs.h group_netlist.xml template.jinja2
 ```
 Use the `--help` flag on any tool and check out the preprint thesis below for more information.
 
@@ -70,7 +76,7 @@ python3 -m netlist_to_csv.netlist_to_csv group_netlist.xml
 ```
 We explain the arguments in the preprint below.
 
-## More Information
+## Thesis Preprint
 We are in the process of writing a thesis about kicad_firmware_generation.
 [Our preprint (in kicad_firmware_generation_preprint.pdf)](./kicad_firmware_generation_preprint.pdf) contains detailed information on tool use, implementation and the Group Netlist specification.
 Especially section 4.1 and below are interesting to users.

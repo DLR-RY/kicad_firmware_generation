@@ -1,0 +1,13 @@
+#pragma once
+
+// Assume we've included some library with types like GND, PD2, VCC, PD5.
+{# ** is a Group Glob matching all Groups. #}
+{% for group in glob_groups("**") %}
+    {% for periphery_pin in group.pins %}
+        {# /Controller is a Group Glob matching only the controller's group. #}
+        {% set controller_pin = group.get_single_pin_to_glob(periphery_pin, "example/Controller") %}
+        {% if controller_pin is not none %}
+#define {{ pascal_case(group.path) }}{{ group.group_type }}_{{ periphery_pin }} {{ controller_pin.pin }}
+        {% endif %}
+    {% endfor %}
+{% endfor %}

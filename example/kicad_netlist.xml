@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="E">
+  <design>
+    <source>/mnt/workspace/kicad_code_gen/example/schematics/example.kicad_sch</source>
+    <date>2026-01-14T11:55:01+0000</date>
+    <tool>Eeschema 9.0.2+dfsg-1</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>example.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="2" name="/POWER_LED/" tstamps="/55f4561b-9e3d-49cb-987f-e3c418905dc4/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>LED.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="3" name="/STATUS_LED/" tstamps="/92d1b184-642b-4766-91b4-271674e56d9a/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>LED.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="4" name="/GREENHOUSE_ILLUMINATION/" tstamps="/dca69bc7-b3d7-495f-af05-33d03983af18/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>LED.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="5" name="/AVIATION_OBSTRUCTION_LIGHTING/" tstamps="/5481df2f-3d1c-497f-a46e-a89035ddac91/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>LED.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+    <sheet number="6" name="/SPARE_LED/" tstamps="/9310c729-f6b0-410f-86e8-d02638b9425f/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>LED.kicad_sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+        <comment number="5" value=""/>
+        <comment number="6" value=""/>
+        <comment number="7" value=""/>
+        <comment number="8" value=""/>
+        <comment number="9" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="C101">
+      <value>100n</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</footprint>
+      <description>Unpolarized capacitor</description>
+      <fields>
+        <field name="Footprint">Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="ki_keywords" value="cap capacitor"/>
+      <property name="ki_fp_filters" value="C_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>d1898894-3a00-4dc8-a317-5f1c0c73a1b2</tstamps>
+    </comp>
+    <comp ref="IO101">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">Timer</field>
+        <field name="GroupPin1">DONE</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="Timer"/>
+      <property name="GroupPin1" value="DONE"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>fec2e50a-c2e5-4dd0-80eb-d33a3d98e290</tstamps>
+    </comp>
+    <comp ref="IO102">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">Timer</field>
+        <field name="GroupPin1">WAKE</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="Timer"/>
+      <property name="GroupPin1" value="WAKE"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>7fae9916-595a-46e1-9c30-b15b5cde2094</tstamps>
+    </comp>
+    <comp ref="J101">
+      <value>ISP</value>
+      <footprint>Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical</footprint>
+      <description>Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <fields>
+        <field name="GroupType">Connector</field>
+        <field name="Footprint">Connector_IDC:IDC-Header_2x03_P2.54mm_Vertical</field>
+        <field name="Datasheet"/>
+        <field name="Description">Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <libsource lib="Connector_Generic" part="Conn_02x03_Odd_Even" description="Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)"/>
+      <property name="GroupType" value="Connector"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="ki_keywords" value="connector"/>
+      <property name="ki_fp_filters" value="Connector*:*_2x??_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>fdfb9451-bd84-4afe-b81e-dc5da6518083</tstamps>
+    </comp>
+    <comp ref="R101">
+      <value>22k021</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>6ee3a50e-b8b1-4e17-ab7a-3c41cf4eed32</tstamps>
+    </comp>
+    <comp ref="U101">
+      <value>ATmega328P-P</value>
+      <footprint>Package_DIP:DIP-28_W7.62mm</footprint>
+      <datasheet>http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf</datasheet>
+      <description>20MHz, 32kB Flash, 2kB SRAM, 1kB EEPROM, DIP-28</description>
+      <fields>
+        <field name="GroupType">Controller</field>
+        <field name="Footprint">Package_DIP:DIP-28_W7.62mm</field>
+        <field name="Datasheet">http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf</field>
+        <field name="Description">20MHz, 32kB Flash, 2kB SRAM, 1kB EEPROM, DIP-28</field>
+      </fields>
+      <libsource lib="MCU_Microchip_ATmega" part="ATmega328P-P" description="20MHz, 32kB Flash, 2kB SRAM, 1kB EEPROM, DIP-28"/>
+      <property name="GroupType" value="Controller"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="ki_keywords" value="AVR 8bit Microcontroller MegaAVR PicoPower"/>
+      <property name="ki_fp_filters" value="DIP*W7.62mm*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>1c8caf2a-ca39-4a3a-b2bc-031683e905fa</tstamps>
+    </comp>
+    <comp ref="U102">
+      <value>TPL5010</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23-6</footprint>
+      <datasheet>http://www.ti.com/lit/ds/symlink/tpl5010.pdf</datasheet>
+      <description>Timer, Nano Power, Watchdog, 35 nA, 100 ms to 7200 s, VDD 1.8V to 5.5V, Iout max 1mA</description>
+      <fields>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23-6</field>
+        <field name="Datasheet">http://www.ti.com/lit/ds/symlink/tpl5010.pdf</field>
+        <field name="Description">Timer, Nano Power, Watchdog, 35 nA, 100 ms to 7200 s, VDD 1.8V to 5.5V, Iout max 1mA</field>
+      </fields>
+      <libsource lib="Timer" part="TPL5010" description="Timer, Nano Power, Watchdog, 35 nA, 100 ms to 7200 s, VDD 1.8V to 5.5V, Iout max 1mA"/>
+      <property name="Sheetname" value=""/>
+      <property name="Sheetfile" value="example.kicad_sch"/>
+      <property name="ki_keywords" value="timer watchdog nano wake done"/>
+      <property name="ki_fp_filters" value="SOT?23*"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamps>ad145935-4d7c-4e82-b253-0b3a4b4fb7ad</tstamps>
+    </comp>
+    <comp ref="Green201">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <description>Light emitting diode</description>
+      <fields>
+        <field name="Footprint">LED_THT:LED_D3.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="POWER_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/POWER_LED/" tstamps="/55f4561b-9e3d-49cb-987f-e3c418905dc4/"/>
+      <tstamps>fcf1cf12-b043-4fc3-bd9c-04ff35312775</tstamps>
+    </comp>
+    <comp ref="IO201">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">LED</field>
+        <field name="GroupPin1">DI_ON</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="LED"/>
+      <property name="GroupPin1" value="DI_ON"/>
+      <property name="Sheetname" value="POWER_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/POWER_LED/" tstamps="/55f4561b-9e3d-49cb-987f-e3c418905dc4/"/>
+      <tstamps>0cbd311d-e899-419b-b26d-aec3bc040109</tstamps>
+    </comp>
+    <comp ref="R201">
+      <value>100R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="POWER_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/POWER_LED/" tstamps="/55f4561b-9e3d-49cb-987f-e3c418905dc4/"/>
+      <tstamps>39f27f0e-9487-4408-a08a-1e309db7e180</tstamps>
+    </comp>
+    <comp ref="Green301">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <description>Light emitting diode</description>
+      <fields>
+        <field name="Footprint">LED_THT:LED_D3.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="STATUS_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/STATUS_LED/" tstamps="/92d1b184-642b-4766-91b4-271674e56d9a/"/>
+      <tstamps>fcf1cf12-b043-4fc3-bd9c-04ff35312775</tstamps>
+    </comp>
+    <comp ref="IO301">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">LED</field>
+        <field name="GroupPin1">DI_ON</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="LED"/>
+      <property name="GroupPin1" value="DI_ON"/>
+      <property name="Sheetname" value="STATUS_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/STATUS_LED/" tstamps="/92d1b184-642b-4766-91b4-271674e56d9a/"/>
+      <tstamps>0cbd311d-e899-419b-b26d-aec3bc040109</tstamps>
+    </comp>
+    <comp ref="R301">
+      <value>100R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="STATUS_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/STATUS_LED/" tstamps="/92d1b184-642b-4766-91b4-271674e56d9a/"/>
+      <tstamps>39f27f0e-9487-4408-a08a-1e309db7e180</tstamps>
+    </comp>
+    <comp ref="Green401">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <description>Light emitting diode</description>
+      <fields>
+        <field name="Footprint">LED_THT:LED_D3.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="GREENHOUSE_ILLUMINATION"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/GREENHOUSE_ILLUMINATION/" tstamps="/dca69bc7-b3d7-495f-af05-33d03983af18/"/>
+      <tstamps>fcf1cf12-b043-4fc3-bd9c-04ff35312775</tstamps>
+    </comp>
+    <comp ref="IO401">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">LED</field>
+        <field name="GroupPin1">DI_ON</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="LED"/>
+      <property name="GroupPin1" value="DI_ON"/>
+      <property name="Sheetname" value="GREENHOUSE_ILLUMINATION"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/GREENHOUSE_ILLUMINATION/" tstamps="/dca69bc7-b3d7-495f-af05-33d03983af18/"/>
+      <tstamps>0cbd311d-e899-419b-b26d-aec3bc040109</tstamps>
+    </comp>
+    <comp ref="R401">
+      <value>100R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="GREENHOUSE_ILLUMINATION"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/GREENHOUSE_ILLUMINATION/" tstamps="/dca69bc7-b3d7-495f-af05-33d03983af18/"/>
+      <tstamps>39f27f0e-9487-4408-a08a-1e309db7e180</tstamps>
+    </comp>
+    <comp ref="Green501">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <description>Light emitting diode</description>
+      <fields>
+        <field name="Footprint">LED_THT:LED_D3.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="AVIATION_OBSTRUCTION_LIGHTING"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/AVIATION_OBSTRUCTION_LIGHTING/" tstamps="/5481df2f-3d1c-497f-a46e-a89035ddac91/"/>
+      <tstamps>fcf1cf12-b043-4fc3-bd9c-04ff35312775</tstamps>
+    </comp>
+    <comp ref="IO501">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">LED</field>
+        <field name="GroupPin1">DI_ON</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="LED"/>
+      <property name="GroupPin1" value="DI_ON"/>
+      <property name="Sheetname" value="AVIATION_OBSTRUCTION_LIGHTING"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/AVIATION_OBSTRUCTION_LIGHTING/" tstamps="/5481df2f-3d1c-497f-a46e-a89035ddac91/"/>
+      <tstamps>0cbd311d-e899-419b-b26d-aec3bc040109</tstamps>
+    </comp>
+    <comp ref="R501">
+      <value>100R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="AVIATION_OBSTRUCTION_LIGHTING"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/AVIATION_OBSTRUCTION_LIGHTING/" tstamps="/5481df2f-3d1c-497f-a46e-a89035ddac91/"/>
+      <tstamps>39f27f0e-9487-4408-a08a-1e309db7e180</tstamps>
+    </comp>
+    <comp ref="Green601">
+      <value>LED</value>
+      <footprint>LED_THT:LED_D3.0mm</footprint>
+      <description>Light emitting diode</description>
+      <fields>
+        <field name="Footprint">LED_THT:LED_D3.0mm</field>
+        <field name="Datasheet"/>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <libsource lib="Device" part="LED" description="Light emitting diode"/>
+      <property name="Sheetname" value="SPARE_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="LED diode"/>
+      <property name="ki_fp_filters" value="LED* LED_SMD:* LED_THT:*"/>
+      <sheetpath names="/SPARE_LED/" tstamps="/9310c729-f6b0-410f-86e8-d02638b9425f/"/>
+      <tstamps>fcf1cf12-b043-4fc3-bd9c-04ff35312775</tstamps>
+    </comp>
+    <comp ref="IO601">
+      <value>Group_IO</value>
+      <footprint>Module_Reference_Frames:Input_Output_Footprint</footprint>
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="GroupType">LED</field>
+        <field name="GroupPin1">DI_ON</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+      </fields>
+      <libsource lib="DLR_Snippet_References" part="Group_IO" description="Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet"/>
+      <property name="GroupType" value="LED"/>
+      <property name="GroupPin1" value="DI_ON"/>
+      <property name="Sheetname" value="SPARE_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="exclude_from_bom"/>
+      <property name="exclude_from_board"/>
+      <sheetpath names="/SPARE_LED/" tstamps="/9310c729-f6b0-410f-86e8-d02638b9425f/"/>
+      <tstamps>0cbd311d-e899-419b-b26d-aec3bc040109</tstamps>
+    </comp>
+    <comp ref="R601">
+      <value>100R</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</footprint>
+      <description>Resistor</description>
+      <fields>
+        <field name="Footprint">Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder</field>
+        <field name="Datasheet"/>
+        <field name="Description">Resistor</field>
+      </fields>
+      <libsource lib="Device" part="R" description="Resistor"/>
+      <property name="Sheetname" value="SPARE_LED"/>
+      <property name="Sheetfile" value="LED.kicad_sch"/>
+      <property name="ki_keywords" value="R res resistor"/>
+      <property name="ki_fp_filters" value="R_*"/>
+      <sheetpath names="/SPARE_LED/" tstamps="/9310c729-f6b0-410f-86e8-d02638b9425f/"/>
+      <tstamps>39f27f0e-9487-4408-a08a-1e309db7e180</tstamps>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="Connector_Generic" part="Conn_02x03_Odd_Even">
+      <description>Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_2x??_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_02x03_Odd_Even</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+        <pin num="5" name="Pin_5" type="passive"/>
+        <pin num="6" name="Pin_6" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="DLR_Snippet_References" part="Group_IO">
+      <description>Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</description>
+      <fields>
+        <field name="Reference">IO</field>
+        <field name="Value">Group_IO</field>
+        <field name="Footprint">Module_Reference_Frames:Input_Output_Footprint</field>
+        <field name="Datasheet"/>
+        <field name="Description">Replace GroupType with the type of snippet this pin belongs to. Replace GroupPin1 with the name of this pin for this snippet. Add fields with the GroupField prefix to define key-value pairs for this nippet</field>
+        <field name="GroupType">TODO</field>
+        <field name="GroupPin1">TODO</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="C">
+      <description>Unpolarized capacitor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Unpolarized capacitor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="LED">
+      <description>Light emitting diode</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>LED*</fp>
+        <fp>LED_SMD:*</fp>
+        <fp>LED_THT:*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">LED</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Light emitting diode</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="Device" part="R">
+      <description>Resistor</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+        <field name="Footprint"/>
+        <field name="Datasheet">~</field>
+        <field name="Description">Resistor</field>
+      </fields>
+      <pins>
+        <pin num="1" name="" type="passive"/>
+        <pin num="2" name="" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="MCU_Microchip_ATmega" part="ATmega328P-P">
+      <description>20MHz, 32kB Flash, 2kB SRAM, 1kB EEPROM, DIP-28</description>
+      <docs>http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf</docs>
+      <footprints>
+        <fp>DIP*W7.62mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ATmega328P-P</field>
+        <field name="Footprint">Package_DIP:DIP-28_W7.62mm</field>
+        <field name="Datasheet">http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf</field>
+        <field name="Description">20MHz, 32kB Flash, 2kB SRAM, 1kB EEPROM, DIP-28</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~{RESET}/PC6" type="bidirectional"/>
+        <pin num="2" name="PD0" type="bidirectional"/>
+        <pin num="3" name="PD1" type="bidirectional"/>
+        <pin num="4" name="PD2" type="bidirectional"/>
+        <pin num="5" name="PD3" type="bidirectional"/>
+        <pin num="6" name="PD4" type="bidirectional"/>
+        <pin num="7" name="VCC" type="power_in"/>
+        <pin num="8" name="GND" type="power_in"/>
+        <pin num="9" name="XTAL1/PB6" type="bidirectional"/>
+        <pin num="10" name="XTAL2/PB7" type="bidirectional"/>
+        <pin num="11" name="PD5" type="bidirectional"/>
+        <pin num="12" name="PD6" type="bidirectional"/>
+        <pin num="13" name="PD7" type="bidirectional"/>
+        <pin num="14" name="PB0" type="bidirectional"/>
+        <pin num="15" name="PB1" type="bidirectional"/>
+        <pin num="16" name="PB2" type="bidirectional"/>
+        <pin num="17" name="PB3" type="bidirectional"/>
+        <pin num="18" name="PB4" type="bidirectional"/>
+        <pin num="19" name="PB5" type="bidirectional"/>
+        <pin num="20" name="AVCC" type="power_in"/>
+        <pin num="21" name="AREF" type="passive"/>
+        <pin num="22" name="GND" type="passive"/>
+        <pin num="23" name="PC0" type="bidirectional"/>
+        <pin num="24" name="PC1" type="bidirectional"/>
+        <pin num="25" name="PC2" type="bidirectional"/>
+        <pin num="26" name="PC3" type="bidirectional"/>
+        <pin num="27" name="PC4" type="bidirectional"/>
+        <pin num="28" name="PC5" type="bidirectional"/>
+      </pins>
+    </libpart>
+    <libpart lib="Timer" part="TPL5010">
+      <description>Timer, Nano Power, Watchdog, 35 nA, 100 ms to 7200 s, VDD 1.8V to 5.5V, Iout max 1mA</description>
+      <docs>http://www.ti.com/lit/ds/symlink/tpl5010.pdf</docs>
+      <footprints>
+        <fp>SOT?23*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">TPL5010</field>
+        <field name="Footprint">Package_TO_SOT_SMD:SOT-23-6</field>
+        <field name="Datasheet">http://www.ti.com/lit/ds/symlink/tpl5010.pdf</field>
+        <field name="Description">Timer, Nano Power, Watchdog, 35 nA, 100 ms to 7200 s, VDD 1.8V to 5.5V, Iout max 1mA</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VDD" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="DELAY/M_RST" type="input"/>
+        <pin num="4" name="DONE" type="input"/>
+        <pin num="5" name="WAKE" type="output"/>
+        <pin num="6" name="~{RST}" type="open_collector"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries/>
+  <nets>
+    <net code="1" name="/AVIATION_OBSTRUCTION_LIGHTING/DI_ON" class="Default">
+      <node ref="Green501" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="IO501" pin="1" pintype="passive"/>
+      <node ref="U101" pin="19" pinfunction="PB5" pintype="bidirectional"/>
+    </net>
+    <net code="2" name="/GREENHOUSE_ILLUMINATION/DI_ON" class="Default">
+      <node ref="Green401" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="IO401" pin="1" pintype="passive"/>
+      <node ref="U101" pin="15" pinfunction="PB1" pintype="bidirectional"/>
+    </net>
+    <net code="3" name="/POWER_LED/DI_ON" class="Default">
+      <node ref="Green201" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="IO201" pin="1" pintype="passive"/>
+      <node ref="U101" pin="14" pinfunction="PB0" pintype="bidirectional"/>
+    </net>
+    <net code="4" name="/SPARE_LED/DI_ON" class="Default">
+      <node ref="Green601" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="IO601" pin="1" pintype="passive"/>
+      <node ref="J101" pin="4" pinfunction="Pin_4" pintype="passive"/>
+    </net>
+    <net code="5" name="/STATUS_LED/DI_ON" class="Default">
+      <node ref="Green301" pin="2" pinfunction="A" pintype="passive"/>
+      <node ref="IO301" pin="1" pintype="passive"/>
+      <node ref="U101" pin="18" pinfunction="PB4" pintype="bidirectional"/>
+    </net>
+    <net code="6" name="/VCC" class="Default">
+      <node ref="C101" pin="2" pintype="passive"/>
+      <node ref="J101" pin="5" pinfunction="Pin_5" pintype="passive"/>
+      <node ref="U101" pin="7" pinfunction="VCC" pintype="power_in"/>
+      <node ref="U102" pin="1" pinfunction="VDD" pintype="power_in"/>
+    </net>
+    <net code="7" name="GND" class="Default">
+      <node ref="C101" pin="1" pintype="passive"/>
+      <node ref="J101" pin="6" pinfunction="Pin_6" pintype="passive"/>
+      <node ref="R101" pin="2" pintype="passive"/>
+      <node ref="R201" pin="1" pintype="passive"/>
+      <node ref="R301" pin="1" pintype="passive"/>
+      <node ref="R401" pin="1" pintype="passive"/>
+      <node ref="R501" pin="1" pintype="passive"/>
+      <node ref="R601" pin="1" pintype="passive"/>
+      <node ref="U101" pin="22" pinfunction="GND" pintype="passive"/>
+      <node ref="U101" pin="8" pinfunction="GND" pintype="power_in"/>
+      <node ref="U102" pin="2" pinfunction="GND" pintype="power_in"/>
+    </net>
+    <net code="8" name="Net-(Green201-K)" class="Default">
+      <node ref="Green201" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R201" pin="2" pintype="passive"/>
+    </net>
+    <net code="9" name="Net-(Green301-K)" class="Default">
+      <node ref="Green301" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R301" pin="2" pintype="passive"/>
+    </net>
+    <net code="10" name="Net-(Green401-K)" class="Default">
+      <node ref="Green401" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R401" pin="2" pintype="passive"/>
+    </net>
+    <net code="11" name="Net-(Green501-K)" class="Default">
+      <node ref="Green501" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R501" pin="2" pintype="passive"/>
+    </net>
+    <net code="12" name="Net-(Green601-K)" class="Default">
+      <node ref="Green601" pin="1" pinfunction="K" pintype="passive"/>
+      <node ref="R601" pin="2" pintype="passive"/>
+    </net>
+    <net code="13" name="Net-(J101-Pin_1)" class="Default">
+      <node ref="J101" pin="1" pinfunction="Pin_1" pintype="passive"/>
+      <node ref="U101" pin="4" pinfunction="PD2" pintype="bidirectional"/>
+    </net>
+    <net code="14" name="Net-(J101-Pin_3)" class="Default">
+      <node ref="J101" pin="3" pinfunction="Pin_3" pintype="passive"/>
+      <node ref="U101" pin="11" pinfunction="PD5" pintype="bidirectional"/>
+    </net>
+    <net code="15" name="Net-(U101-PC5)" class="Default">
+      <node ref="U101" pin="28" pinfunction="PC5" pintype="bidirectional"/>
+      <node ref="U102" pin="6" pinfunction="~{RST}" pintype="open_collector"/>
+    </net>
+    <net code="16" name="Net-(U101-PD3)" class="Default">
+      <node ref="IO101" pin="1" pintype="passive"/>
+      <node ref="U101" pin="5" pinfunction="PD3" pintype="bidirectional"/>
+      <node ref="U102" pin="5" pinfunction="WAKE" pintype="output"/>
+    </net>
+    <net code="17" name="Net-(U101-PD4)" class="Default">
+      <node ref="IO102" pin="1" pintype="passive"/>
+      <node ref="U101" pin="6" pinfunction="PD4" pintype="bidirectional"/>
+      <node ref="U102" pin="4" pinfunction="DONE" pintype="input"/>
+    </net>
+    <net code="18" name="Net-(U102-DELAY/M_RST)" class="Default">
+      <node ref="R101" pin="1" pintype="passive"/>
+      <node ref="U102" pin="3" pinfunction="DELAY/M_RST" pintype="input"/>
+    </net>
+    <net code="19" name="unconnected-(J101-Pin_2-Pad2)" class="Default">
+      <node ref="J101" pin="2" pinfunction="Pin_2" pintype="passive"/>
+    </net>
+    <net code="20" name="unconnected-(U101-AREF-Pad21)" class="Default">
+      <node ref="U101" pin="21" pinfunction="AREF" pintype="passive"/>
+    </net>
+    <net code="21" name="unconnected-(U101-AVCC-Pad20)" class="Default">
+      <node ref="U101" pin="20" pinfunction="AVCC" pintype="power_in"/>
+    </net>
+    <net code="22" name="unconnected-(U101-PB2-Pad16)" class="Default">
+      <node ref="U101" pin="16" pinfunction="PB2" pintype="bidirectional"/>
+    </net>
+    <net code="23" name="unconnected-(U101-PB3-Pad17)" class="Default">
+      <node ref="U101" pin="17" pinfunction="PB3" pintype="bidirectional"/>
+    </net>
+    <net code="24" name="unconnected-(U101-PC0-Pad23)" class="Default">
+      <node ref="U101" pin="23" pinfunction="PC0" pintype="bidirectional"/>
+    </net>
+    <net code="25" name="unconnected-(U101-PC1-Pad24)" class="Default">
+      <node ref="U101" pin="24" pinfunction="PC1" pintype="bidirectional"/>
+    </net>
+    <net code="26" name="unconnected-(U101-PC2-Pad25)" class="Default">
+      <node ref="U101" pin="25" pinfunction="PC2" pintype="bidirectional"/>
+    </net>
+    <net code="27" name="unconnected-(U101-PC3-Pad26)" class="Default">
+      <node ref="U101" pin="26" pinfunction="PC3" pintype="bidirectional"/>
+    </net>
+    <net code="28" name="unconnected-(U101-PC4-Pad27)" class="Default">
+      <node ref="U101" pin="27" pinfunction="PC4" pintype="bidirectional"/>
+    </net>
+    <net code="29" name="unconnected-(U101-PD0-Pad2)" class="Default">
+      <node ref="U101" pin="2" pinfunction="PD0" pintype="bidirectional"/>
+    </net>
+    <net code="30" name="unconnected-(U101-PD1-Pad3)" class="Default">
+      <node ref="U101" pin="3" pinfunction="PD1" pintype="bidirectional"/>
+    </net>
+    <net code="31" name="unconnected-(U101-PD6-Pad12)" class="Default">
+      <node ref="U101" pin="12" pinfunction="PD6" pintype="bidirectional"/>
+    </net>
+    <net code="32" name="unconnected-(U101-PD7-Pad13)" class="Default">
+      <node ref="U101" pin="13" pinfunction="PD7" pintype="bidirectional"/>
+    </net>
+    <net code="33" name="unconnected-(U101-XTAL1/PB6-Pad9)" class="Default">
+      <node ref="U101" pin="9" pinfunction="XTAL1/PB6" pintype="bidirectional"/>
+    </net>
+    <net code="34" name="unconnected-(U101-XTAL2/PB7-Pad10)" class="Default">
+      <node ref="U101" pin="10" pinfunction="XTAL2/PB7" pintype="bidirectional"/>
+    </net>
+    <net code="35" name="unconnected-(U101-~{RESET}/PC6-Pad1)" class="Default">
+      <node ref="U101" pin="1" pinfunction="~{RESET}/PC6" pintype="bidirectional"/>
+    </net>
+  </nets>
+</export>

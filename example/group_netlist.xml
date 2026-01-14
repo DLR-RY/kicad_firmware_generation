@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='utf-8'?>
+<groupNetlist>
+    <!--WARNING: This file has been automatically generated. Do not edit!-->
+    <netlist>
+        <sources>
+            <source>/mnt/workspace/kicad_code_gen/example/schematics/example.kicad_sch</source>
+        </sources>
+        <date>2026-01-14T11:55:07.306736</date>
+        <tool>kicad_group_netlister v0.1.0 v0.1.0</tool>
+    </netlist>
+    <groups>
+        <group schematic="example" path="/" type="Connector">
+            <groupMapFields />
+            <pins>
+                <pin name="Pin_1" />
+                <pin name="Pin_2" />
+                <pin name="Pin_3" />
+                <pin name="Pin_4" />
+                <pin name="Pin_5" />
+                <pin name="Pin_6" />
+            </pins>
+        </group>
+        <group schematic="example" path="/" type="Controller">
+            <groupMapFields />
+            <pins>
+                <pin name="AREF" />
+                <pin name="AVCC" />
+                <pin name="GND" />
+                <pin name="PB0" />
+                <pin name="PB1" />
+                <pin name="PB2" />
+                <pin name="PB3" />
+                <pin name="PB4" />
+                <pin name="PB5" />
+                <pin name="PC0" />
+                <pin name="PC1" />
+                <pin name="PC2" />
+                <pin name="PC3" />
+                <pin name="PC4" />
+                <pin name="PC5" />
+                <pin name="PD0" />
+                <pin name="PD1" />
+                <pin name="PD2" />
+                <pin name="PD3" />
+                <pin name="PD4" />
+                <pin name="PD5" />
+                <pin name="PD6" />
+                <pin name="PD7" />
+                <pin name="VCC" />
+                <pin name="XTAL1_PB6" />
+                <pin name="XTAL2_PB7" />
+                <pin name="__RESET__PC6" />
+            </pins>
+        </group>
+        <group schematic="example" path="/" type="Timer">
+            <groupMapFields />
+            <pins>
+                <pin name="DONE" />
+                <pin name="WAKE" />
+            </pins>
+        </group>
+        <group schematic="example" path="/AVIATION_OBSTRUCTION_LIGHTING/" type="LED">
+            <groupMapFields />
+            <pins>
+                <pin name="DI_ON" />
+            </pins>
+        </group>
+        <group schematic="example" path="/GREENHOUSE_ILLUMINATION/" type="LED">
+            <groupMapFields />
+            <pins>
+                <pin name="DI_ON" />
+            </pins>
+        </group>
+        <group schematic="example" path="/POWER_LED/" type="LED">
+            <groupMapFields />
+            <pins>
+                <pin name="DI_ON" />
+            </pins>
+        </group>
+        <group schematic="example" path="/SPARE_LED/" type="LED">
+            <groupMapFields />
+            <pins>
+                <pin name="DI_ON" />
+            </pins>
+        </group>
+        <group schematic="example" path="/STATUS_LED/" type="LED">
+            <groupMapFields />
+            <pins>
+                <pin name="DI_ON" />
+            </pins>
+        </group>
+    </groups>
+    <nets>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_1" />
+            <node schematic="example" path="/" type="Controller" pin="PD2" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_2" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_3" />
+            <node schematic="example" path="/" type="Controller" pin="PD5" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_4" />
+            <node schematic="example" path="/SPARE_LED/" type="LED" pin="DI_ON" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_5" />
+            <node schematic="example" path="/" type="Controller" pin="VCC" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Connector" pin="Pin_6" />
+            <node schematic="example" path="/" type="Controller" pin="GND" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="AREF" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="AVCC" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB0" />
+            <node schematic="example" path="/POWER_LED/" type="LED" pin="DI_ON" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB1" />
+            <node schematic="example" path="/GREENHOUSE_ILLUMINATION/" type="LED" pin="DI_ON" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB2" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB3" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB4" />
+            <node schematic="example" path="/STATUS_LED/" type="LED" pin="DI_ON" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PB5" />
+            <node schematic="example" path="/AVIATION_OBSTRUCTION_LIGHTING/" type="LED" pin="DI_ON" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC0" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC1" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC2" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC3" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC4" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PC5" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD0" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD1" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD3" />
+            <node schematic="example" path="/" type="Timer" pin="DONE" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD4" />
+            <node schematic="example" path="/" type="Timer" pin="WAKE" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD6" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="PD7" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="XTAL1_PB6" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="XTAL2_PB7" />
+        </net>
+        <net>
+            <node schematic="example" path="/" type="Controller" pin="__RESET__PC6" />
+        </net>
+    </nets>
+</groupNetlist>
