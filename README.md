@@ -1,12 +1,12 @@
-# kicad_firmware_geneneration: Extract Information from KiCad Schematics and Generate Firmware
+# kicad_firmware_generation: Extract Information from KiCad Schematics and Generate Firmware
 When you design hardware, you often develop firmware, too.
 That firmware needs to know which controller pin controls what functionality.
 So you adapt the firmware to the specific hardware, e.g., with a pin definition C header.
 What if you didn't have to do so manually?
-kicad_firmware_geneneration is a tool suite for generating (parts of) the firmware based on information from KiCad schematics.<br />
+kicad_firmware_generation is a tool suite for generating (parts of) the firmware based on information from KiCad schematics.<br />
 What even is a single functionality the controller cares about?
 Typically a group of components perform a function the firmware controls.
-Therefore, kicad_firmware_geneneration thinks in **Group**s, each representing multiple components.
+Therefore, kicad_firmware_generation thinks in **Group**s, each representing multiple components.
 Our **Group Netlist XML** file format stores this information of your KiCad schematic:
 What Groups are there and how are they connected?
 
@@ -19,15 +19,15 @@ There are four programs around the Group Netlist:
 3. group_netlist_merger: When you have multiple schematics connected together, just merge their Group Netlists.
 4. netlist_to_csv: Convert a Group Netlist into a spreadsheet; for those who like spreadsheets.
 
-![kicad_firmware_gen overview](./software_overview.svg)
+![kicad_firmware_gen overview](./software_overview.png)
 
 The [common_types](./common_types) directory contains an independent library to parse, handle and serialise a Group Netlist
 If you have a use-case we haven't yet come up with, that's a place to start.
 
 ### Installation
 - Install KiCad, Python and Jinja2: `sudo apt install kicad python3 python3-jinja2`
-- `git clone https://github.com/DLR-RY/kicad_firmware_geneneration`
-- `cd kicad_firmware_geneneration`
+- `git clone https://github.com/DLR-RY/kicad_firmware_generation`
+- `cd kicad_firmware_generation`
 - `python3 -m pip install -e .`
 
 ### Quick Start
@@ -71,7 +71,7 @@ python3 -m netlist_to_csv.netlist_to_csv group_netlist.xml
 We explain the arguments in the preprint below.
 
 ## More Information
-We are in the process of writing a thesis about kicad_firmware_geneneration.
+We are in the process of writing a thesis about kicad_firmware_generation.
 [Our preprint (in kicad_firmware_generation_preprint.pdf)](./kicad_firmware_generation_preprint.pdf) contains detailed information on tool use, implementation and the Group Netlist specification.
 Especially section 4.1 and below are interesting to users.
 However, there are still major chapters missing.
