@@ -1,9 +1,9 @@
-# kicad_firmware_gen: Extract Information from KiCad Schematics
+# kicad_firmware_gen: Extract Information from KiCad Schematics and Generate Firmware
 When you design hardware, you often develop firmware, too.
 That firmware needs to know which controller pin controls what functionality.
 So you adapt the firmware to the specific hardware, e.g., with a pin definition C header.
 What if you didn't have to do so manually?
-kicad_firmware_gen is a tool suite for generating (parts of) firmware based on information from KiCad schematics.<br />
+kicad_firmware_gen is a tool suite for generating (parts of) the firmware based on information from KiCad schematics.<br />
 What even is a single functionality the controller cares about?
 Typically a group of components perform a function the firmware controls.
 Therefore, kicad_firmware_gen thinks in **Group**s, each representing multiple components.
@@ -12,7 +12,7 @@ What Groups are there and how are they connected?
 
 There are four programs around the Group Netlist:
 1. kicad_group_netlister: Extract Information from your KiCad schematics and create a Group Netlist XML file.
-2. code_gen: Take your Jinja2 template, hands it the information from the Group Netlist and generates your firmware or any other file:
+2. code_gen: Take your Jinja2 template, hand it the information from the Group Netlist and generate your firmware or any other file:
     C++, Rust, HTML or Markdown Documentation or maybe even some SVG for your child to play with?
     The sky is the limit!
     Actually, we are the DLR, soo...why not build a satellite with this?
@@ -65,5 +65,6 @@ python3 -m netlist_to_csv.netlist_to_csv group_netlist.xml
 
 ## More Information
 We are in the process of writing a thesis about kicad_firmware_gen.
-[Our preprint](./eps_firmware_generation_v6.pdf) contains detailed information on tool use, implementation and the Group Netlist specification.
-While we publish all other files under the [MIT license](./LICENSE), we reserve all rights to this file.
+[Our preprint](./eps_firmware_generation_preprint.pdf) contains detailed information on tool use, implementation and the Group Netlist specification.
+However, there are still major chapters missing.
+Also, while we publish all other files under the [MIT license](./LICENSE), we reserve all rights to this file.

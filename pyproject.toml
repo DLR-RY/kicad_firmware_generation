@@ -1,11 +1,10 @@
 [project]
-name = "kicad_code_gen"
+name = "kicad_firmware_gen"
 version = "0.1.0"
 dependencies = [
     # TODO: version
     "jinja2",
 ]
-# TODO: possibly older version
 requires-python = ">3.13"
 authors = [
     {name = "Christopher Besch", email = "mail@chris-besch.com"}
@@ -13,14 +12,11 @@ authors = [
 maintainers = [
     {name = "Christopher Besch", email = "mail@chris-besch.com"}
 ]
-# TODO
-description = ""
-# TODO
-# license = ""
+description = "Extract Information from KiCad Schematics and Generate Firmware"
+license = "MIT"
 readme = "README.md"
 license-files = ["LICENSE"]
-# TODO
-keywords = []
+keywords = ["kicad", "firmware", "templating", "generation"]
 
 [tool.setuptools]
 packages = ["kicad_group_netlister", "code_gen", "common_types", "netlist_to_csv", "group_netlist_merger"]
