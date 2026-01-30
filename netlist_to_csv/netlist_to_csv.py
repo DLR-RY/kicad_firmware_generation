@@ -198,7 +198,7 @@ def main() -> None:
         Path(args.group_netlist_path),
         root_group_glob,
         simplify_pins,
-        None if args.output_path is None else Path(args.output_path),
+        None if args.output is None else Path(args.output),
     )
 
 

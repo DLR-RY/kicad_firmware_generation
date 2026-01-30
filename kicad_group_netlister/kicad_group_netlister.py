@@ -355,7 +355,7 @@ def main() -> None:
     create_group_netlist_from_kicad(
         Path(args.kicad_netlist_file),
         args.lenient_names,
-        None if args.output_path is None else Path(args.output_path),
+        None if args.output is None else Path(args.output),
     )
 
 

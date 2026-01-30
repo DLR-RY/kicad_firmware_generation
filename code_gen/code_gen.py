@@ -129,8 +129,8 @@ def main() -> None:
     args = parser.parse_args()
 
     generate_code(
-        Path(args.netlist_path),
-        Path(args.template_path),
+        Path(args.group_netlist_file),
+        Path(args.template_file_path),
         None if args.template_dir_env is None else Path(args.template_dir_env),
         None if args.output is None else Path(args.output),
     )
