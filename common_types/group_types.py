@@ -262,7 +262,7 @@ CHAR_PATTERN = re.compile(r"^[a-zA-Z0-9_\-\+ ]$")
 CHAR_WITH_SLASH_PATTERN = re.compile(r"^[a-zA-Z0-9_/\-\+ ]$")
 
 
-def assert_is_group_path(in_str: str, lenient=False) -> GroupPath:
+def assert_is_group_path(in_str: str, lenient: bool = False) -> GroupPath:
     if lenient:
         in_str = replace_illegal_characters_wo_slash(in_str)
     if GROUP_PATH_PATTERN.match(in_str) is None:
@@ -274,7 +274,7 @@ def assert_is_group_path(in_str: str, lenient=False) -> GroupPath:
     return GroupPath(in_str)
 
 
-def assert_is_schematic(in_str: str, lenient=False) -> Schematic:
+def assert_is_schematic(in_str: str, lenient: bool = False) -> Schematic:
     if lenient:
         in_str = replace_illegal_characters(in_str)
     if SCHEMATIC_PATTERN.match(in_str) is None:
@@ -286,7 +286,7 @@ def assert_is_schematic(in_str: str, lenient=False) -> Schematic:
     return Schematic(in_str)
 
 
-def assert_is_group_type(in_str: str, lenient=False) -> GroupType:
+def assert_is_group_type(in_str: str, lenient: bool = False) -> GroupType:
     if lenient:
         in_str = replace_illegal_characters(in_str)
     if GROUP_TYPE_PATTERN.match(in_str) is None:
@@ -298,7 +298,7 @@ def assert_is_group_type(in_str: str, lenient=False) -> GroupType:
     return GroupType(in_str)
 
 
-def assert_is_pin_name(in_str: str, lenient=False) -> GroupPinName:
+def assert_is_pin_name(in_str: str, lenient: bool = False) -> GroupPinName:
     if lenient:
         in_str = replace_illegal_characters(in_str)
     if PIN_NAME_PATTERN.match(in_str) is None:

@@ -42,40 +42,17 @@ def _camel_case(in_str: str) -> str:
     return _change_case(in_str, False)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        prog=TOOL_NAME,
-        description="Generate a file from a Jinja2 template based on the information from a Group Netlist. "
-        "The output is printed to stdout, errors and warnings to stderr.",
-    )
-    parser.add_argument(
-        "group_netlist_file",
-        help="The path to a Group Netlist file.",
-    )
-    parser.add_argument(
-        "template_file_path",
-        help="The path to a Jinja2 template. "
-        "This file may include other template files. "
-        "You may specify the template directory environment these included template files are relative to. "
-        "See the --template-dir-env argument. "
-        "Alternatively, code_gen uses the parent directory of the template_file_path.",
-    )
-    parser.add_argument(
-        "--template-dir-env",
-        help="The path to the Jinja2 template directory environment.",
-    )
-    parser.add_argument(
-        "--output",
-        help="The output path. Print to stdout if not provided.",
-    )
-    args = parser.parse_args()
-
-    netlist_path = Path(args.group_netlist_file)
-    template_path = Path(args.template_file_path)
+def generate_code(
+    netlist_path: Path,
+    template_path: Path,
+    template_dir_env: Path | None,
+    output_path: Path | None,
+) -> None:
+    """
+    This function does the same and has the same parameters as the code_gen CLI interface.
+    """
     template_env_path = (
-        args.template_dir_env
-        if args.template_dir_env is not None
-        else template_path.parent
+        template_dir_env if template_dir_env is not None else template_path.parent
     )
     if not template_path.is_relative_to(template_env_path):
         print(
@@ -115,12 +92,48 @@ def main() -> None:
         camel_case=_camel_case,
         get_parent_group_path=get_parent_group_path,
     )
-    if args.output is not None:
-        print(f"Printing output to: {args.output}")
-        with open(args.output, "w") as file:
+    if output_path is not None:
+        print(f"Printing output to: {output_path}")
+        with open(output_path, "w") as file:
             file.write(output)
     else:
         print(output)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog=TOOL_NAME,
+        description="Generate a file from a Jinja2 template based on the information from a Group Netlist. "
+        "The output is printed to stdout, errors and warnings to stderr.",
+    )
+    parser.add_argument(
+        "group_netlist_file",
+        help="The path to a Group Netlist file.",
+    )
+    parser.add_argument(
+        "template_file_path",
+        help="The path to a Jinja2 template. "
+        "This file may include other template files. "
+        "You may specify the template directory environment these included template files are relative to. "
+        "See the --template-dir-env argument. "
+        "Alternatively, code_gen uses the parent directory of the template_file_path.",
+    )
+    parser.add_argument(
+        "--template-dir-env",
+        help="The path to the Jinja2 template directory environment.",
+    )
+    parser.add_argument(
+        "--output",
+        help="The output path. Print to stdout if not provided.",
+    )
+    args = parser.parse_args()
+
+    generate_code(
+        Path(args.netlist_path),
+        Path(args.template_path),
+        None if args.template_dir_env is None else Path(args.template_dir_env),
+        None if args.output is None else Path(args.output),
+    )
 
 
 if __name__ == "__main__":

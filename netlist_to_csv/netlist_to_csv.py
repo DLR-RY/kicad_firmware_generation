@@ -2,7 +2,7 @@ import argparse
 import csv
 from pathlib import Path
 import sys
-from typing import Set, Tuple
+from typing import Set, TextIO, Tuple
 import re
 
 from common_types.group_types import (
@@ -102,55 +102,25 @@ def _focus_on_root(
     return netlist
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        prog=TOOL_NAME,
-        description="Convert a group netlist to a csv. "
-        "The output is printed to stdout, errors and warnings to stderr.",
-    )
-    parser.add_argument("group_netlist_path", help="The path to the group netlist.")
-    parser.add_argument(
-        "--root-group-glob",
-        help="From what groups' perspective should the output be? "
-        "This field is a glob. Use ** to match multiple path nodes. "
-        "If this field is provided, only groups that don't match are considered as other groups. "
-        "I.e., connections from matched groups to other matched groups are ignored. "
-        "If this isn't provided, all groups will be included.",
-    )
-    parser.add_argument(
-        "--simplify-pins",
-        help="If a group connects to a pin that has this field as a substring, reduce all pins that belong to this net to a single pin with the provided name. "
-        "Separate multiple values with a comma (,). "
-        "When more than on simplification matches, an arbitraty one will be chosen."
-        "This is, for example, useful to replace all GND connections with a single GND pin.",
-    )
-    parser.add_argument(
-        "--output",
-        help="The output path. Print to stdout if not provided.",
-    )
-    args = parser.parse_args()
-
-    group_netlist_path = Path(args.group_netlist_path)
-
-    simplify_pins: Set[GroupPinName] = {
-        assert_is_pin_name(pin)
-        for pin in ([] if args.simplify_pins is None else args.simplify_pins.split(","))
-    }
-
-    root_group_glob = (
-        None
-        if args.root_group_glob is None
-        else compile_group_glob(args.root_group_glob)
-    )
+def create_csv_from_netlist(
+    group_netlist_path: Path,
+    root_group_glob: GroupGlob | None,
+    simplify_pins: Set[GroupPinName],
+    output_path: Path | None,
+) -> None:
+    """
+    This function does the same and has the same parameters as the netlist_to_csv CLI interface.
+    """
 
     netlist = connect_netlist(parse_group_netlist(group_netlist_path))
     simple_netlist = _simplify_nets(netlist, simplify_pins)
     simple_root_focus_netlist = _focus_on_root(simple_netlist, root_group_glob)
 
-    if args.output is not None:
-        print(f"Printing output to: {args.output}")
+    output_file: TextIO
+    if output_path is not None:
+        print(f"Printing output to: {output_path}")
         # We can't use with because we might print to stdout.
-        output_file = open(args.output, "w")
+        output_file = open(output_path, "w")
     else:
         output_file = sys.stdout
 
@@ -183,6 +153,53 @@ def main() -> None:
                 "other_pins": other_pins_str,
             })
     output_file.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog=TOOL_NAME,
+        description="Convert a group netlist to a csv. "
+        "The output is printed to stdout, errors and warnings to stderr.",
+    )
+    parser.add_argument("group_netlist_path", help="The path to the group netlist.")
+    parser.add_argument(
+        "--root-group-glob",
+        help="From what groups' perspective should the output be? "
+        "This field is a glob. Use ** to match multiple path nodes. "
+        "If this field is provided, only groups that don't match are considered as other groups. "
+        "I.e., connections from matched groups to other matched groups are ignored. "
+        "If this isn't provided, all groups will be included.",
+    )
+    parser.add_argument(
+        "--simplify-pins",
+        help="If a group connects to a pin that has this field as a substring, reduce all pins that belong to this net to a single pin with the provided name. "
+        "Separate multiple values with a comma (,). "
+        "When more than on simplification matches, an arbitraty one will be chosen."
+        "This is, for example, useful to replace all GND connections with a single GND pin.",
+    )
+    parser.add_argument(
+        "--output",
+        help="The output path. Print to stdout if not provided.",
+    )
+    args = parser.parse_args()
+
+    simplify_pins: Set[GroupPinName] = {
+        assert_is_pin_name(pin)
+        for pin in ([] if args.simplify_pins is None else args.simplify_pins.split(","))
+    }
+
+    root_group_glob = (
+        None
+        if args.root_group_glob is None
+        else compile_group_glob(args.root_group_glob)
+    )
+
+    create_csv_from_netlist(
+        Path(args.group_netlist_path),
+        root_group_glob,
+        simplify_pins,
+        None if args.output_path is None else Path(args.output_path),
+    )
 
 
 if __name__ == "__main__":

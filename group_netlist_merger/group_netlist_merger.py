@@ -154,6 +154,40 @@ def _connect_netlist(
     return netlist
 
 
+def merge_group_netlists(
+    pin_mapper: PinMapper,
+    connect_group_globs: Set[GroupGlob],
+    output_path: Path | None,
+    netlist_paths: Set[Path],
+) -> None:
+    """
+    This function does the same and has the same parameters as the group_netlist_merger CLI interface.
+    """
+
+    netlists: Set[GroupNetlist] = set()
+    for netlist_path in netlist_paths:
+        netlist = parse_group_netlist(netlist_path)
+        for other_netlist in netlists:
+            assert len(other_netlist.sources & netlist.sources) == 0
+        netlists.add(netlist)
+
+    merged_group_netlist = _merge_group_netlists(
+        netlists,
+    )
+    connected_merged_group_netlist = _connect_netlist(
+        merged_group_netlist,
+        connect_group_globs,
+        pin_mapper,
+    )
+    output = stringify_group_netlist(connected_merged_group_netlist)
+    if output_path is not None:
+        print(f"Printing output to: {output_path}")
+        with open(output_path, "wb") as file:
+            file.write(output)
+    else:
+        sys.stdout.buffer.write(output)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
@@ -169,11 +203,6 @@ def main() -> None:
         choices=list(PinMapper),
     )
     parser.add_argument(
-        "group_netlist_file",
-        help="The path to a Group Netlist files. You may provide multiple.",
-        nargs="+",
-    )
-    parser.add_argument(
         "--connect-group-glob",
         help="All groups that match this glob are merged into a single one. "
         "All groups that match must have exactly the same pins. "
@@ -186,33 +215,21 @@ def main() -> None:
         "--output",
         help="The output path. Print to stdout if not provided.",
     )
-    args = parser.parse_args()
-    netlist_paths = {Path(path) for path in args.group_netlist_file}
-
-    netlists: Set[GroupNetlist] = set()
-    for netlist_path in netlist_paths:
-        netlist = parse_group_netlist(netlist_path)
-        for other_netlist in netlists:
-            assert len(other_netlist.sources & netlist.sources) == 0
-        netlists.add(netlist)
-
-    merged_group_netlist = _merge_group_netlists(
-        netlists,
+    parser.add_argument(
+        "group_netlist_file",
+        help="The path to a Group Netlist files. You may provide multiple.",
+        nargs="+",
     )
-    connected_merged_group_netlist = _connect_netlist(
-        merged_group_netlist,
+    args = parser.parse_args()
+
+    merge_group_netlists(
+        args.pin_mapper,
         set()
         if args.connect_group_glob is None
         else {compile_group_glob(group_glob) for group_glob in args.connect_group_glob},
-        args.pin_mapper,
+        None if args.output is None else Path(args.output),
+        {Path(path) for path in args.group_netlist_file},
     )
-    output = stringify_group_netlist(connected_merged_group_netlist)
-    if args.output is not None:
-        print(f"Printing output to: {args.output}")
-        with open(args.output, "wb") as file:
-            file.write(output)
-    else:
-        sys.stdout.buffer.write(output)
 
 
 if __name__ == "__main__":

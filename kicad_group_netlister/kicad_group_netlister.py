@@ -307,6 +307,31 @@ def _check_kicad_netlist_structure(netlist: KiCadNetlist) -> None:
             sys.exit(1)
 
 
+def create_group_netlist_from_kicad(
+    kicad_netlist_path: Path, lenient_names: bool, output_path: Path | None
+) -> None:
+    """
+    This function does the same and has the same parameters as the kicad_group_netlister CLI interface.
+    """
+    kicad_netlist = parse_kicad_netlist(kicad_netlist_path, lenient_names)
+    _check_kicad_netlist_structure(kicad_netlist)
+
+    groups_lookup, groups_reverse_lookup = _group_components_by_group(
+        kicad_netlist, lenient_names
+    )
+    netlist = _gen_group_netlist(
+        kicad_netlist, groups_lookup, groups_reverse_lookup, lenient_names
+    )
+
+    output = stringify_group_netlist(netlist)
+    if output_path is not None:
+        print(f"Printing output to: {output_path}")
+        with open(output_path, "wb") as file:
+            file.write(output)
+    else:
+        sys.stdout.buffer.write(output)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog=TOOL_NAME,
@@ -327,25 +352,11 @@ def main() -> None:
         help="The output path. Print to stdout if not provided.",
     )
     args = parser.parse_args()
-    kicad_netlist_path = Path(args.kicad_netlist_file)
-
-    kicad_netlist = parse_kicad_netlist(kicad_netlist_path, args.lenient_names)
-    _check_kicad_netlist_structure(kicad_netlist)
-
-    groups_lookup, groups_reverse_lookup = _group_components_by_group(
-        kicad_netlist, args.lenient_names
+    create_group_netlist_from_kicad(
+        Path(args.kicad_netlist_file),
+        args.lenient_names,
+        None if args.output_path is None else Path(args.output_path),
     )
-    netlist = _gen_group_netlist(
-        kicad_netlist, groups_lookup, groups_reverse_lookup, args.lenient_names
-    )
-
-    output = stringify_group_netlist(netlist)
-    if args.output is not None:
-        print(f"Printing output to: {args.output}")
-        with open(args.output, "wb") as file:
-            file.write(output)
-    else:
-        sys.stdout.buffer.write(output)
 
 
 if __name__ == "__main__":
