@@ -3,6 +3,7 @@ name = "kicad_firmware_generation"
 version = "0.1.0"
 dependencies = [
     "jinja2>=3.1.6",
+    "kicad-skip>=0.2.5",
 ]
 requires-python = ">3.13"
 authors = [
@@ -18,10 +19,11 @@ license-files = ["LICENSE"]
 keywords = ["kicad", "firmware", "templating", "generation"]
 
 [tool.setuptools]
-packages = ["kicad_group_netlister", "code_gen", "common_types", "netlist_to_csv", "group_netlist_merger"]
+packages = ["kicad_group_netlister", "code_gen", "common_types", "netlist_to_csv", "group_netlist_merger", "benchmarker_tool"]
 
 [project.scripts]
 kicad_group_netlister = "kicad_group_netlister.kicad_group_netlister:main"
 code_gen = "code_gen.code_gen:main"
 netlist_to_csv = "netlist_to_csv.netlist_to_csv:main"
 group_netlist_merger = "group_netlist_merger.group_netlist_merger:main"
+benchmarker_tool = "benchmarker_tool.benchmarker_tool:main"
