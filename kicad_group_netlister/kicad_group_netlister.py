@@ -217,6 +217,8 @@ def _gen_group_netlist(
             else:
                 # When the user didn't define any GroupPin names for at all we use a fallback:
                 # We consider all pins that belong to components that belong to the group as pins of the group.
+                # This causes problems when there are two pins with the same pin function.
+                # Right now it's up to the user to not create such a case.
                 group_pin_name = assert_is_pin_name(
                     node.pinfunction, lenient=lenient_names
                 )
