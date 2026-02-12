@@ -79,7 +79,7 @@ def _simplify_nets(
 # only from connector to other groups (i.e., non-root groups).
 def _focus_on_root(
     netlist: GroupNetlistWithConnections,
-    root_group_glob: GroupGlob | None,
+    root_group_glob: GroupGlob,
 ) -> GroupNetlistWithConnections:
     # Remove all root pins from the other pins.
     def remove_root_pins(group: GroupWithConnection) -> GroupWithConnection:
@@ -104,7 +104,7 @@ def _focus_on_root(
 
 def create_csv_from_netlist(
     group_netlist_path: Path,
-    root_group_glob: GroupGlob | None,
+    root_group_glob: GroupGlob,
     simplify_pins: Set[GroupPinName],
     output_path: Path | None,
 ) -> None:
@@ -189,7 +189,7 @@ def main() -> None:
     }
 
     root_group_glob = (
-        None
+        compile_group_glob("**")
         if args.root_group_glob is None
         else compile_group_glob(args.root_group_glob)
     )
