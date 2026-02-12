@@ -1,5 +1,6 @@
 from pathlib import Path
 import tempfile
+import csv
 import timeit
 import subprocess
 from typing import Any, Dict, List
@@ -29,10 +30,11 @@ GROUP_TYPES = [
     "GroupTypeHotel",
 ]
 REPETITIONS = 2
+CSV_OUTPUT_FILE = f"./statistics_rep_{REPETITIONS}_ratio_{SYMBOL_ANNOTATION_RATIO}.csv"
 
 
 def main() -> None:
-    schematic_files = []
+    schematic_files: List[str] = []
     for root, dirs, files in os.walk("."):
         for name in files:
             if name.endswith(".sch") or name.endswith(".kicad_sch"):
@@ -42,7 +44,14 @@ def main() -> None:
     statistics: Dict[str, Dict[str, Any]] = dict()
     for file in schematic_files:
         print(f"Creating benchmark for: {file}")
-        schem = skip.Schematic(file)
+        # TODO: remove
+        statistics[file] = {"file": file, "sym_count": 0}
+        continue
+        try:
+            schem = skip.Schematic(file)
+        except:
+            print("skip read error")
+            continue
         for symbol in random.sample(
             sorted(schem.symbol), int(SYMBOL_ANNOTATION_RATIO * len(schem.symbol))
         ):
@@ -61,9 +70,13 @@ def main() -> None:
                 group_pin_field.name = f"GroupPin{pin.number}"
                 group_pin_field.value = f"GroupPin{pinname_counter}"
                 pinname_counter += 1
-        statistics[file] = {"sym_count": len(schem.symbol)}
 
-        schem.write(file)
+        try:
+            schem.write(file)
+        except:
+            print("skip write error")
+            continue
+        statistics[file] = {"file": file, "sym_count": len(schem.symbol)}
 
     for file, statistic in statistics.items():
         print(f"Creating KiCad Netlist for: {file}")
@@ -72,37 +85,57 @@ def main() -> None:
 
         def run_kicad_cli():
             run = subprocess.run(
-                f"kicad-cli sch export netlist --format kicadxml --output {kicad_netlist_file} {file}",
+                [
+                    "kicad-cli",
+                    "sch",
+                    "export",
+                    "netlist",
+                    "--format",
+                    "kicadxml",
+                    "--output",
+                    kicad_netlist_file,
+                    str(file),
+                ],
                 stderr=subprocess.PIPE,
-                shell=True,
             )
             if run.returncode != 0:
                 raise ValueError(run.stderr)
 
-        statistic["kicad-cli"] = timeit.timeit(
-            run_kicad_cli,
-            number=REPETITIONS,
-        )
-        print(f"{statistic['kicad-cli']}s")
+        # TODO: uncomment
+        # statistic["kicad-cli"] = timeit.timeit(
+        #     run_kicad_cli,
+        #     number=REPETITIONS,
+        # )
+        # print(f"{statistic['kicad-cli']}s")
 
+    drop_files: List[str] = []
     for file, statistic in statistics.items():
         print(f"Creating Group Netlist for: {file}")
         group_netlist_file = f"{file}_group_netlist.xml"
         statistic["group_netlist_file"] = group_netlist_file
 
-        statistic["kicad_group_netlister"] = timeit.timeit(
-            lambda: create_group_netlist_from_kicad(
-                Path(statistic["kicad_netlist_file"]),
-                True,
-                Path(group_netlist_file),
-            ),
-            number=REPETITIONS,
-        )
+        try:
+            statistic["kicad_group_netlister"] = timeit.timeit(
+                lambda: create_group_netlist_from_kicad(
+                    Path(statistic["kicad_netlist_file"]),
+                    True,
+                    Path(group_netlist_file),
+                ),
+                number=REPETITIONS,
+            )
+        except:
+            print("Error in kicad_group_netlister")
+            drop_files += [file]
+            continue
+
         group_netlist = parse_group_netlist(Path(group_netlist_file))
         statistic["groups"] = len(group_netlist.groups)
-        statistic["average_pins_per_group"] = sum([
-            len(group.pins) for group in group_netlist.groups.values()
-        ]) / len(group_netlist.groups)
+        statistic["average_pins_per_group"] = (
+            None
+            if len(group_netlist.groups) == 0
+            else sum([len(group.pins) for group in group_netlist.groups.values()])
+            / len(group_netlist.groups)
+        )
         statistic["nets"] = len(group_netlist.nets)
         statistic["nets_with_multiple_nodes"] = len([
             net for net in group_netlist.nets if len(net) >= 2
@@ -110,6 +143,9 @@ def main() -> None:
         print(
             f"{statistic['kicad_group_netlister']}s; groups: {statistic['groups']}; average_pins_per_group: {statistic['average_pins_per_group']}; nets: {statistic['nets']}; nets_with_multiple_nodes: {statistic['nets_with_multiple_nodes']}"
         )
+
+    for file in drop_files:
+        statistics.pop(file)
 
     template_str = """
 #pragma once
@@ -171,7 +207,17 @@ def main() -> None:
                 f"{statistic['netlist_to_csv']}s; csv_lines: {statistic['csv_lines']}"
             )
 
-    print(statistics)
+    with open(CSV_OUTPUT_FILE, "w") as file:
+        csv_writer = csv.DictWriter(
+            file,
+            delimiter=",",
+            quotechar='"',
+            fieldnames=list(statistics.values())[0].keys(),
+            quoting=csv.QUOTE_MINIMAL,
+        )
+        csv_writer.writeheader()
+        for statistic in statistics.values():
+            csv_writer.writerow(statistic)
 
 
 if __name__ == "__main__":

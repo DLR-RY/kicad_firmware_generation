@@ -238,6 +238,7 @@ def connect_netlist(netlist: GroupNetlist) -> GroupNetlistWithConnections:
     # Figure out what groups are connected how.
     for net in netlist.nets:
         for group_identifier, group_pin_name in net:
+            print(group_identifier, group_pin_name)
             # No one has touched this before so it must have remained empty.
             assert (
                 len(connected_netlist.groups[group_identifier].pins[group_pin_name])
