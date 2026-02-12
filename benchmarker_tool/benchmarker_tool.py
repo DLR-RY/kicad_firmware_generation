@@ -11,6 +11,7 @@ from kicad_group_netlister.kicad_group_netlister import create_group_netlist_fro
 from code_gen.code_gen import generate_code
 from netlist_to_csv.netlist_to_csv import create_csv_from_netlist
 from common_types.parse_xml import parse_group_netlist
+from common_types.group_types import compile_group_glob
 
 from skip.eeschema.schematic.symbol import SymbolPin
 
@@ -149,6 +150,28 @@ def main() -> None:
             print(f"{statistic['code_gen']}s")
 
         print(statistics)
+
+    for file, statistic in statistics.items():
+        print(f"Creating CSV for: {file}")
+        csv_file = f"{file}_spreadsheet.csv"
+        statistic["csv_file"] = csv_file
+
+        statistic["netlist_to_csv"] = timeit.timeit(
+            lambda: create_csv_from_netlist(
+                Path(statistic["group_netlist_file"]),
+                None,
+                set(),
+                Path(csv_file),
+            ),
+            number=REPETITIONS,
+        )
+        with open(csv_file) as file:
+            statistic["csv_lines"] = len(file.readlines())
+            print(
+                f"{statistic['netlist_to_csv']}s; csv_lines: {statistic['csv_lines']}"
+            )
+
+    print(statistics)
 
 
 if __name__ == "__main__":
