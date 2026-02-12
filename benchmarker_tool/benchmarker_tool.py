@@ -159,7 +159,7 @@ def main() -> None:
         statistic["netlist_to_csv"] = timeit.timeit(
             lambda: create_csv_from_netlist(
                 Path(statistic["group_netlist_file"]),
-                None,
+                compile_group_glob("**"),
                 set(),
                 Path(csv_file),
             ),
