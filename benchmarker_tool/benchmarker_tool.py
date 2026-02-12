@@ -29,8 +29,9 @@ GROUP_TYPES = [
     "GroupTypeGolf",
     "GroupTypeHotel",
 ]
-REPETITIONS = 2
-CSV_OUTPUT_FILE = f"./statistics_rep_{REPETITIONS}_ratio_{SYMBOL_ANNOTATION_RATIO}.csv"
+KICAD_CLI_REPETITIONS = 4
+REPETITIONS = 100
+CSV_OUTPUT_FILE = f"./statistics_rep_{REPETITIONS}_kicad_rep_{KICAD_CLI_REPETITIONS}_ratio_{SYMBOL_ANNOTATION_RATIO}.csv"
 
 
 def main() -> None:
@@ -45,38 +46,49 @@ def main() -> None:
     for file in schematic_files:
         print(f"Creating benchmark for: {file}")
         # TODO: remove
-        statistics[file] = {"file": file, "sym_count": 0}
-        continue
+        # statistics[file] = {"file": file, "sym_count": 0}
+        # continue
         try:
             schem = skip.Schematic(file)
         except:
-            print("skip read error")
+            print("Error in skip read")
             continue
+        annotated_symbols = 0
         for symbol in random.sample(
             sorted(schem.symbol), int(SYMBOL_ANNOTATION_RATIO * len(schem.symbol))
         ):
+            # # Sometimes this is broken.
+            # # Skip those cases.
+            # if symbol.pin is None:
+            #     continue
+
             # Group Type
             group_type_field = symbol.property.Reference.clone()
             group_type_field.name = "GroupType"
             group_type_field.value = random.choice(GROUP_TYPES)
 
             # Group Pins
-            if symbol.pin is None:
-                continue
-            for pin in symbol.pin:
-                if type(pin) is not SymbolPin:
-                    continue
+            # for pin in symbol.pin:
+            #     if type(pin) is not SymbolPin:
+            #         continue
+            # pin.number
+            for number in range(100 if symbol.pin is None else len(symbol.pin) + 10):
                 group_pin_field = symbol.property.Reference.clone()
-                group_pin_field.name = f"GroupPin{pin.number}"
+                group_pin_field.name = f"GroupPin{number}"
                 group_pin_field.value = f"GroupPin{pinname_counter}"
                 pinname_counter += 1
+            annotated_symbols += 1
 
         try:
             schem.write(file)
         except:
-            print("skip write error")
+            print("Error in skip write")
             continue
-        statistics[file] = {"file": file, "sym_count": len(schem.symbol)}
+        statistics[file] = {
+            "file": file,
+            "sym_count": len(schem.symbol),
+            "annotated_symbols": annotated_symbols,
+        }
 
     for file, statistic in statistics.items():
         print(f"Creating KiCad Netlist for: {file}")
@@ -102,11 +114,11 @@ def main() -> None:
                 raise ValueError(run.stderr)
 
         # TODO: uncomment
-        # statistic["kicad-cli"] = timeit.timeit(
-        #     run_kicad_cli,
-        #     number=REPETITIONS,
-        # )
-        # print(f"{statistic['kicad-cli']}s")
+        statistic["kicad-cli"] = timeit.timeit(
+            run_kicad_cli,
+            number=KICAD_CLI_REPETITIONS,
+        )
+        print(f"{statistic['kicad-cli']}s")
 
     drop_files: List[str] = []
     for file, statistic in statistics.items():
@@ -165,6 +177,7 @@ def main() -> None:
 {% endfor %}
     """
 
+    drop_files: List[str] = []
     with tempfile.NamedTemporaryFile(mode="w") as template_file:
         template_file.write(template_str)
         template_file.flush()
@@ -174,38 +187,53 @@ def main() -> None:
             code_file = f"{file}_code.h"
             statistic["code_file"] = code_file
 
-            statistic["code_gen"] = timeit.timeit(
-                lambda: generate_code(
-                    Path(statistic["group_netlist_file"]),
-                    Path(template_file.name),
-                    None,
-                    Path(code_file),
-                ),
-                number=REPETITIONS,
-            )
+            try:
+                statistic["code_gen"] = timeit.timeit(
+                    lambda: generate_code(
+                        Path(statistic["group_netlist_file"]),
+                        Path(template_file.name),
+                        None,
+                        Path(code_file),
+                    ),
+                    number=REPETITIONS,
+                )
+            except:
+                print("Error in code_gen")
+                drop_files += [file]
+                continue
             print(f"{statistic['code_gen']}s")
 
-        print(statistics)
+    for file in drop_files:
+        statistics.pop(file)
 
+    drop_files: List[str] = []
     for file, statistic in statistics.items():
         print(f"Creating CSV for: {file}")
         csv_file = f"{file}_spreadsheet.csv"
         statistic["csv_file"] = csv_file
 
-        statistic["netlist_to_csv"] = timeit.timeit(
-            lambda: create_csv_from_netlist(
-                Path(statistic["group_netlist_file"]),
-                compile_group_glob("**"),
-                set(),
-                Path(csv_file),
-            ),
-            number=REPETITIONS,
-        )
+        try:
+            statistic["netlist_to_csv"] = timeit.timeit(
+                lambda: create_csv_from_netlist(
+                    Path(statistic["group_netlist_file"]),
+                    compile_group_glob("**"),
+                    set(),
+                    Path(csv_file),
+                ),
+                number=REPETITIONS,
+            )
+        except:
+            print("Error in netlist_to_csv")
+            drop_files += [file]
+            continue
         with open(csv_file) as file:
             statistic["csv_lines"] = len(file.readlines())
             print(
                 f"{statistic['netlist_to_csv']}s; csv_lines: {statistic['csv_lines']}"
             )
+
+    for file in drop_files:
+        statistics.pop(file)
 
     with open(CSV_OUTPUT_FILE, "w") as file:
         csv_writer = csv.DictWriter(
