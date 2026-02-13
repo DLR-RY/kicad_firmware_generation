@@ -84,84 +84,32 @@ Especially section 4.1 and below are interesting to users.
 Also, while we publish all other files under the [MIT license](./LICENSE), we reserve all rights to that thesis, a copy of which is in this repo.
 
 # Benchmarking kicad_firmware_generation
-1. Find Open-Hardware projects from git@gitlab.com:christopher-besch/kicad-website: `grep -n 'projecturl' content/made-with-kicad/*/*.adoc | grep -oP '".+"' | grep -P 'gitlab.com|github.com' | sort | uniq`
-2. Clone all repos.
-3. Find all schematic files (`.sch` and `.kicad_sch`) and
-    1. Update to newest KiCad version. ???
-    2. Count symbols.
-    3. Choose 3 Group Types for each file.
-       Choose them randomly for 40% of all symbols.
-       Create GroupPin fields for each pin of each symbol (global counter).
-    4. Use kicad_group_netlister, benchmark.
-    5. Count Groups.
-    6. Count Nets with more than one Group.
-3. Identify KiCad projects in each repo, generate Group Netlist for each, benchmark.
-4. Use code_gen, benchmark.
-5. Use netlist_to_csv, benchmark.
-5. Use group_netlist_merger on randomly chosen projects with groups that have the same pin names, benchmark.
-
-```
-https://github.com/antevens/boatcontrol
-https://github.com/AntonioMR/ATMEGA328-Motor-Board
-https://github.com/BoltzRnD/SmartPrintCoreH7x
-https://github.com/ciaa/Hardware
-https://github.com/dmitrystu/Nucleo2USB
-https://github.com/dmitrystu/nuco-v
-https://github.com/Edgeberry
-https://github.com/GlasgowEmbedded/glasgow
-https://github.com/inversepath/usbarmory
-https://github.com/jemtech/ILDA
-https://github.com/ludwig1992/tlnixie
-https://github.com/maxlab-io/tokay-lite-pcb
-https://github.com/OLIMEX/DIY-LAPTO
-https://github.com/OLIMEX/OLINUXIN
-https://github.com/Open-Smartwatch/kicad-project
-https://github.com/Pakequis/Bad-Thing-of-the-Edge-keyboard
-https://github.com/pms67/HadesFCS/
-https://github.com/rocketscream/TinyReflowController
-https://github.com/ThunderFly-aerospace/TFGPS01
-https://github.com/ThunderFly-aerospace/TFSLOT01
-https://github.com/venseytech/VB-IoT1
-https://github.com/VimDrones/AM32_esc_development_board
-https://github.com/weirdgyn/Driverino-Shield
-https://gitlab.com/librespacefoundation/satnogs-comms/satnogs-comms-hardware
-https://gitlab.com/phodina/echo-debug-gen3
-```
-
-- `for url in https://github.com/antevens/boatcontrol https://github.com/AntonioMR/ATMEGA328-Motor-Board https://github.com/BoltzRnD/SmartPrintCoreH7x https://github.com/ciaa/Hardware https://github.com/dmitrystu/Nucleo2USB https://github.com/dmitrystu/nuco-v https://github.com/Edgeberry https://github.com/GlasgowEmbedded/glasgow https://github.com/inversepath/usbarmory https://github.com/jemtech/ILDA https://github.com/ludwig1992/tlnixie https://github.com/maxlab-io/tokay-lite-pcb https://github.com/OLIMEX/DIY-LAPTO https://github.com/OLIMEX/OLINUXIN https://github.com/Open-Smartwatch/kicad-project https://github.com/Pakequis/Bad-Thing-of-the-Edge-keyboard https://github.com/pms67/HadesFCS/ https://github.com/rocketscream/TinyReflowController https://github.com/ThunderFly-aerospace/TFGPS01 https://github.com/ThunderFly-aerospace/TFSLOT01 https://github.com/venseytech/VB-IoT1 https://github.com/VimDrones/AM32_esc_development_board https://github.com/weirdgyn/Driverino-Shield https://gitlab.com/librespacefoundation/satnogs-comms/satnogs-comms-hardware https://gitlab.com/phodina/echo-debug-gen3; do git clone --recurse $url; done`
-- `find . -name '*.sch' -or -name '*.kicad_sch' | while read file; do echo $file; done`
-- `python3 -m benchmarker_tool.benchmarker_tool`
-
-
-```
-AM32_esc_development_board/
-ATMEGA328-Motor-Board/
-Bad-Thing-of-the-Edge-keyboard/
-Driverino-Shield/
-HadesFCS/
-Hardware/
-ILDA/
-Nucleo2USB/
-SmartPrintCoreH7x/
-TFGPS01/
-TFSLOT01/
-TinyReflowController/
-VB-IoT1/
-boatcontrol/
-echo-debug-gen3/
-glasgow/
-kicad-project/
-nuco-v/
-satnogs-comms-hardware/
-tlnixie/
-tokay-lite-pcb/
-usbarmory/
-```
-
-# Threads to Validity
-- bad examples
-- bad synthesis of annotation
-- double counting sheets
-- calling from python interface rather than from cli
-- open-source vs commercial
-- simple template
+To benchmark this tooling use `python3 -m benchmarker_tool.benchmarker_tool` inside a directory with all test schematics.
+This tool will add random annotations to all `.kicad_sch` files; USE WITH CARE!
+We downloaded the following Open-Hardware projects:
+- https://github.com/antevens/boatcontrol
+- https://github.com/AntonioMR/ATMEGA328-Motor-Board
+- https://github.com/BoltzRnD/SmartPrintCoreH7x
+- https://github.com/ciaa/Hardware
+- https://github.com/dmitrystu/Nucleo2USB
+- https://github.com/dmitrystu/nuco-v
+- https://github.com/Edgeberry
+- https://github.com/GlasgowEmbedded/glasgow
+- https://github.com/inversepath/usbarmory
+- https://github.com/jemtech/ILDA
+- https://github.com/ludwig1992/tlnixie
+- https://github.com/maxlab-io/tokay-lite-pcb
+- https://github.com/OLIMEX/DIY-LAPTO
+- https://github.com/OLIMEX/OLINUXIN
+- https://github.com/Open-Smartwatch/kicad-project
+- https://github.com/Pakequis/Bad-Thing-of-the-Edge-keyboard
+- https://github.com/pms67/HadesFCS/
+- https://github.com/rocketscream/TinyReflowController
+- https://github.com/ThunderFly-aerospace/TFGPS01
+- https://github.com/ThunderFly-aerospace/TFSLOT01
+- https://github.com/venseytech/VB-IoT1
+- https://github.com/VimDrones/AM32_esc_development_board
+- https://github.com/weirdgyn/Driverino-Shield
+- https://gitlab.com/librespacefoundation/satnogs-comms/satnogs-comms-hardware
+- https://gitlab.com/phodina/echo-debug-gen3
+You can use this command to do so: `for url in https://github.com/antevens/boatcontrol https://github.com/AntonioMR/ATMEGA328-Motor-Board https://github.com/BoltzRnD/SmartPrintCoreH7x https://github.com/ciaa/Hardware https://github.com/dmitrystu/Nucleo2USB https://github.com/dmitrystu/nuco-v https://github.com/Edgeberry https://github.com/GlasgowEmbedded/glasgow https://github.com/inversepath/usbarmory https://github.com/jemtech/ILDA https://github.com/ludwig1992/tlnixie https://github.com/maxlab-io/tokay-lite-pcb https://github.com/OLIMEX/DIY-LAPTO https://github.com/OLIMEX/OLINUXIN https://github.com/Open-Smartwatch/kicad-project https://github.com/Pakequis/Bad-Thing-of-the-Edge-keyboard https://github.com/pms67/HadesFCS/ https://github.com/rocketscream/TinyReflowController https://github.com/ThunderFly-aerospace/TFGPS01 https://github.com/ThunderFly-aerospace/TFSLOT01 https://github.com/venseytech/VB-IoT1 https://github.com/VimDrones/AM32_esc_development_board https://github.com/weirdgyn/Driverino-Shield https://gitlab.com/librespacefoundation/satnogs-comms/satnogs-comms-hardware https://gitlab.com/phodina/echo-debug-gen3; do git clone --recurse $url; done`

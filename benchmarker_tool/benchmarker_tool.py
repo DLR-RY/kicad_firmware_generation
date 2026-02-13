@@ -14,8 +14,6 @@ from netlist_to_csv.netlist_to_csv import create_csv_from_netlist
 from common_types.parse_xml import parse_group_netlist
 from common_types.group_types import compile_group_glob
 
-from skip.eeschema.schematic.symbol import SymbolPin
-
 TOOL_NAME = "benchmarker_tool v0.1.0"
 
 SYMBOL_ANNOTATION_RATIO = 0.4
