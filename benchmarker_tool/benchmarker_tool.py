@@ -16,7 +16,7 @@ from common_types.group_types import compile_group_glob
 
 TOOL_NAME = "benchmarker_tool v0.1.0"
 
-SYMBOL_ANNOTATION_RATIO = 0.4
+SYMBOL_ANNOTATION_RATIO = 0.17
 GROUP_TYPES = [
     "GroupTypeAlpha",
     "GroupTypeBravo",
@@ -27,8 +27,8 @@ GROUP_TYPES = [
     "GroupTypeGolf",
     "GroupTypeHotel",
 ]
-KICAD_CLI_REPETITIONS = 4
-REPETITIONS = 100
+KICAD_CLI_REPETITIONS = 20
+REPETITIONS = KICAD_CLI_REPETITIONS
 CSV_OUTPUT_FILE = f"./statistics_rep_{REPETITIONS}_kicad_rep_{KICAD_CLI_REPETITIONS}_ratio_{SYMBOL_ANNOTATION_RATIO}.csv"
 
 
@@ -84,8 +84,8 @@ def main() -> None:
             continue
         statistics[file] = {
             "file": file,
-            "sym_count": len(schem.symbol),
-            "annotated_symbols": annotated_symbols,
+            "sym_count_in_root_sheet": len(schem.symbol),
+            "annotated_symbols_in_root_sheet": annotated_symbols,
         }
 
     for file, statistic in statistics.items():
@@ -112,10 +112,23 @@ def main() -> None:
                 raise ValueError(run.stderr)
 
         # TODO: uncomment
-        statistic["kicad-cli"] = timeit.timeit(
-            run_kicad_cli,
-            number=KICAD_CLI_REPETITIONS,
+        statistic["kicad-cli"] = (
+            timeit.timeit(
+                run_kicad_cli,
+                number=KICAD_CLI_REPETITIONS,
+            )
+            / KICAD_CLI_REPETITIONS
         )
+
+        with open(kicad_netlist_file) as file:
+            statistic["comp_count"] = len([
+                line for line in file.readlines() if line == "    </comp>\n"
+            ])
+            file.seek(0)
+            statistic["net_count"] = len([
+                line for line in file.readlines() if line == "    </net>\n"
+            ])
+
         print(f"{statistic['kicad-cli']}s")
 
     drop_files: List[str] = []
@@ -125,13 +138,16 @@ def main() -> None:
         statistic["group_netlist_file"] = group_netlist_file
 
         try:
-            statistic["kicad_group_netlister"] = timeit.timeit(
-                lambda: create_group_netlist_from_kicad(
-                    Path(statistic["kicad_netlist_file"]),
-                    True,
-                    Path(group_netlist_file),
-                ),
-                number=REPETITIONS,
+            statistic["kicad_group_netlister"] = (
+                timeit.timeit(
+                    lambda: create_group_netlist_from_kicad(
+                        Path(statistic["kicad_netlist_file"]),
+                        True,
+                        Path(group_netlist_file),
+                    ),
+                    number=REPETITIONS,
+                )
+                / REPETITIONS
             )
         except:
             print("Error in kicad_group_netlister")
@@ -186,14 +202,17 @@ def main() -> None:
             statistic["code_file"] = code_file
 
             try:
-                statistic["code_gen"] = timeit.timeit(
-                    lambda: generate_code(
-                        Path(statistic["group_netlist_file"]),
-                        Path(template_file.name),
-                        None,
-                        Path(code_file),
-                    ),
-                    number=REPETITIONS,
+                statistic["code_gen"] = (
+                    timeit.timeit(
+                        lambda: generate_code(
+                            Path(statistic["group_netlist_file"]),
+                            Path(template_file.name),
+                            None,
+                            Path(code_file),
+                        ),
+                        number=REPETITIONS,
+                    )
+                    / REPETITIONS
                 )
             except:
                 print("Error in code_gen")
@@ -211,14 +230,17 @@ def main() -> None:
         statistic["csv_file"] = csv_file
 
         try:
-            statistic["netlist_to_csv"] = timeit.timeit(
-                lambda: create_csv_from_netlist(
-                    Path(statistic["group_netlist_file"]),
-                    compile_group_glob("**"),
-                    set(),
-                    Path(csv_file),
-                ),
-                number=REPETITIONS,
+            statistic["netlist_to_csv"] = (
+                timeit.timeit(
+                    lambda: create_csv_from_netlist(
+                        Path(statistic["group_netlist_file"]),
+                        compile_group_glob("**"),
+                        set(),
+                        Path(csv_file),
+                    ),
+                    number=REPETITIONS,
+                )
+                / REPETITIONS
             )
         except:
             print("Error in netlist_to_csv")
@@ -234,11 +256,35 @@ def main() -> None:
         statistics.pop(file)
 
     with open(CSV_OUTPUT_FILE, "w") as file:
+        columns = [
+            # file
+            "file",
+            "kicad_netlist_file",
+            "group_netlist_file",
+            "csv_file",
+            "code_file",
+            # stats
+            "sym_count_in_root_sheet",
+            "annotated_symbols_in_root_sheet",
+            "comp_count",
+            "net_count",
+            "average_pins_per_group",
+            "groups",
+            "nets",
+            "nets_with_multiple_nodes",
+            "csv_lines",
+            # results
+            "kicad-cli",
+            "kicad_group_netlister",
+            "code_gen",
+            "netlist_to_csv",
+        ]
+
         csv_writer = csv.DictWriter(
             file,
             delimiter=",",
             quotechar='"',
-            fieldnames=list(statistics.values())[0].keys(),
+            fieldnames=columns,
             quoting=csv.QUOTE_MINIMAL,
         )
         csv_writer.writeheader()
