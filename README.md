@@ -77,8 +77,7 @@ python3 -m netlist_to_csv.netlist_to_csv group_netlist.xml
 We explain the arguments in the preprint below.
 
 ## Thesis Preprint
-We are in the process of writing a thesis about kicad_firmware_generation.
-[Our preprint (in kicad_firmware_generation_preprint.pdf)](./kicad_firmware_generation_preprint.pdf) contains detailed information on tool use, implementation and the Group Netlist specification.
+We wrote [a thesis](https://chris-besch.com/articles/kicad_firmware_generation.pdf) about kicad_firmware_generation.
+It contains detailed information on tool use, implementation and the Group Netlist specification.
 Especially section 4.1 and below are interesting to users.
-However, there are still major chapters missing.
-Also, while we publish all other files under the [MIT license](./LICENSE), we reserve all rights to this file.
+Also, while we publish all other files under the [MIT license](./LICENSE), we reserve all rights to that thesis, a copy of which is in this repo.
