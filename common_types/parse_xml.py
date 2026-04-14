@@ -68,7 +68,7 @@ def _parse_xml_root(path: Path) -> Tuple[ET.Element, Set[Path], datetime, str]:
     sources: Set[Path] = set()
     for source_tag in source_tags:
         assert source_tag.text is not None
-        assert source_tag.text not in sources
+        assert Path(source_tag.text) not in sources
         sources.add(Path(source_tag.text))
 
     date_tags = root.findall("./netlist/date")
