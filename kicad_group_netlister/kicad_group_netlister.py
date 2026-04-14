@@ -1,4 +1,5 @@
 import argparse
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -37,6 +38,8 @@ GROUP_MAP_FIELD_PREFIX = "GroupMapField"
 
 TOOL_NAME = "kicad_group_netlister v0.1.0"
 TOOL_NAME_WITH_VERSION = f"{TOOL_NAME} v0.1.0"
+
+STRIP_UNDERSCORE_PLUS_NUMBER_REGEX = re.compile(r"_.+$")
 
 
 def _group_components_by_group(
@@ -156,6 +159,17 @@ def _get_explicit_pin_name_lookups(
     return explicit_pin_namings
 
 
+# Turn pinfunction_abc_69
+# into pinfunction_abc
+def _strip_trailing_pinfunction(in_str: str) -> str:
+    if len(STRIP_UNDERSCORE_PLUS_NUMBER_REGEX.findall(in_str)) == 0:
+        print(
+            f"Warning: The pinfunction `{in_str}` has no suffix like `_123`. That's not what --strip-trailing-pinfunction expected. Are you sure you're on KiCad 10 and newer?",
+            file=sys.stderr,
+        )
+    return STRIP_UNDERSCORE_PLUS_NUMBER_REGEX.sub("", in_str)
+
+
 # The KiCad netlist connects pins on components to other pins on other components.
 # This function converts that netlist into a netlist that connects pins on groups to other pins on other groups.
 # The names of the pins are the GroupPin names and not the KiCad pin names any longer.
@@ -164,6 +178,7 @@ def _gen_group_netlist(
     raw_groups_lookup: RawGroupLookup,
     groups_reverse_lookup: GroupsReverseLookup,
     lenient_names: bool,
+    strip_trailing_pinfunction: bool,
 ) -> GroupNetlist:
     explicit_pin_name_lookups = _get_explicit_pin_name_lookups(
         raw_groups_lookup, lenient_names
@@ -220,7 +235,10 @@ def _gen_group_netlist(
                 # This causes problems when there are two pins with the same pin function.
                 # Right now it's up to the user to not create such a case.
                 group_pin_name = assert_is_pin_name(
-                    node.pinfunction, lenient=lenient_names
+                    _strip_trailing_pinfunction(node.pinfunction)
+                    if strip_trailing_pinfunction
+                    else node.pinfunction,
+                    lenient=lenient_names,
                 )
 
             # Assign None because we represent connections using nets and not other pins in the groups.
@@ -310,7 +328,10 @@ def _check_kicad_netlist_structure(netlist: KiCadNetlist) -> None:
 
 
 def create_group_netlist_from_kicad(
-    kicad_netlist_path: Path, lenient_names: bool, output_path: Path | None
+    kicad_netlist_path: Path,
+    lenient_names: bool,
+    strip_trailing_pinfunction: bool,
+    output_path: Path | None,
 ) -> None:
     """
     This function does the same and has the same parameters as the kicad_group_netlister CLI interface.
@@ -322,7 +343,11 @@ def create_group_netlist_from_kicad(
         kicad_netlist, lenient_names
     )
     netlist = _gen_group_netlist(
-        kicad_netlist, groups_lookup, groups_reverse_lookup, lenient_names
+        kicad_netlist,
+        groups_lookup,
+        groups_reverse_lookup,
+        lenient_names,
+        strip_trailing_pinfunction,
     )
 
     output = stringify_group_netlist(netlist)
@@ -350,6 +375,13 @@ def main() -> None:
         action="store_true",
     )
     parser.add_argument(
+        "--strip-trailing-pinfunction",
+        help="When using implicit pin naming the pinfunction will be used. "
+        "This is an issue with KiCad 10 and later because they add the pin number after the real pinfunction to the kicadxml netlist. "
+        "Therefore, this feature strips any leading underscore plus number.",
+        action="store_true",
+    )
+    parser.add_argument(
         "--output",
         help="The output path. Print to stdout if not provided.",
     )
@@ -357,6 +389,7 @@ def main() -> None:
     create_group_netlist_from_kicad(
         Path(args.kicad_netlist_file),
         args.lenient_names,
+        args.strip_trailing_pinfunction,
         None if args.output is None else Path(args.output),
     )
 

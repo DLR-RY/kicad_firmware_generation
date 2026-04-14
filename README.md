@@ -52,6 +52,7 @@ kicad-cli sch export netlist --format kicadxml --output kicad_netlist.xml schema
 ```
 python3 -m kicad_group_netlister.kicad_group_netlister --lenient-names --output group_netlist.xml kicad_netlist.xml
 ```
+You'll have to add the `--strip-trailing-pinfunction` flag when you're using KiCad 10 or newer.
 
 3. Generate Firmware from Jinja2 Template.
 ```
