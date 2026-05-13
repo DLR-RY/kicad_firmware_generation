@@ -14,10 +14,11 @@ while true; do
     echo copying work_dir
     cp -r source_dir work_dir
 
+    mkdir -v reports/${run_idx}
+
     echo changing a thing
     changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx})"
-
-    mkdir -v reports/${run_idx}
+    echo ${changed_thing}
 
     while read -r cmd; do
         cmd_idx=$(ls -1 reports/${run_idx} | wc -l)
