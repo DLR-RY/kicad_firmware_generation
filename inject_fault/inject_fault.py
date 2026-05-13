@@ -5,8 +5,10 @@ import shutil
 
 
 def delete_wire(schem) -> str:
+    if schem.wire is None:
+        return None
     if len(schem.wire) == 0:
-        return "none"
+        return None
     wire = choice(schem.wire)
     changed_thing = f"delete_wire;{wire.start.value}-{wire.end.value}"
     wire.delete()
@@ -16,22 +18,32 @@ def delete_wire(schem) -> str:
 # Watch that some swapping is actually okay and shouldn't lead to an error.
 # E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
 def swap_labels(schem) -> str:
+    if schem.label is None:
+        return None
     return f"swap_labels;{swap(schem.label, schem.label)}"
 
 
 def swap_label_no_connect(schem) -> str:
+    if schem.label is None:
+        return None
+    if schem.no_connect is None:
+        return None
     return f"swap_label_no_connect;{swap(schem.no_connect, schem.label)}"
 
 
 def swap(first_group, second_group) -> str:
     if len(first_group) == 0:
-        return "none"
+        return None
     first_node = choice(first_group)
     neighbours = second_group.within_reach_of(first_node, 20)
     if len(neighbours) == 0:
         # don't do anything in this case
-        return "none"
+        return None
     second_node = choice(neighbours)
+
+    # Don't swap with itself
+    if first_node.value == second_node.value:
+        return None
 
     # swap positions
     first_node_at = tuple(first_node.at)
@@ -48,7 +60,9 @@ def change_file(file: str) -> str:
 
     schem = skip.Schematic(in_file)
 
-    changed_thing = choices((delete_wire, swap_labels, swap_label_no_connect), weights=(20, 50, 30), k=1)[0](schem)
+    changed_thing = None
+    while changed_thing is None:
+        changed_thing = choices((delete_wire, swap_labels, swap_label_no_connect), weights=(20, 50, 30), k=1)[0](schem)
 
     schem.write(in_file)
     shutil.copyfile(in_file, report_file)
