@@ -15,9 +15,7 @@ while true; do
     cp -r source_dir work_dir
 
     echo changing a thing
-    pushd "work_dir"
-    changed_thing="$(python3 -m inject_fault.inject_fault)"
-    popd
+    changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx})"
 
     mkdir -v reports/${run_idx}
 
@@ -33,4 +31,5 @@ while true; do
     done < cmds.txt
 
     echo "${run_idx},${changed_thing},$(ls -1 reports/${run_idx} | wc -l),$(cat cmds.txt | wc -l)" >> reports/central.csv
+    tail -n 1 reports/central.csv
 done
