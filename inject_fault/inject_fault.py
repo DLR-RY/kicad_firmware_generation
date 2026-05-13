@@ -1,6 +1,6 @@
 import skip
 import sys
-from random import choice
+from random import choice, choices
 import shutil
 
 
@@ -13,29 +13,33 @@ def delete_wire(schem) -> str:
     return changed_thing
 
 
+# Watch that some swapping is actually okay and shouldn't lead to an error.
+# E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
 def swap_labels(schem) -> str:
-    if len(schem.label) == 0:
+    return f"swap_labels;{swap(schem.label, schem.label)}"
+
+
+def swap_label_no_connect(schem) -> str:
+    return f"swap_label_no_connect;{swap(schem.no_connect, schem.label)}"
+
+
+def swap(first_group, second_group) -> str:
+    if len(first_group) == 0:
         return "none"
-    first_label = choice(schem.label)
-    neighbours = schem.label.within_reach_of(first_label, 20)
+    first_node = choice(first_group)
+    neighbours = second_group.within_reach_of(first_node, 20)
     if len(neighbours) == 0:
         # don't do anything in this case
         return "none"
-    second_label = choice(neighbours)
+    second_node = choice(neighbours)
 
     # swap positions
-    first_label_at = tuple(first_label.at)
-    second_label_at = tuple(second_label.at)
-    first_label.move(second_label_at)
-    second_label.move(first_label_at)
+    first_node_at = tuple(first_node.at)
+    second_node_at = tuple(second_node.at)
+    first_node.move(second_node_at)
+    second_node.move(first_node_at)
 
-    return f"swap_labels;{first_label.value}-{second_label.value}"
-
-    # TODO: swap neighbouring labels and neighbouring No Connect Flag (swapping cables is difficult)
-    # Watch that some swapping is actually okay and shouldn't lead to an error.
-    # E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
-
-# TODO: swap label with no connect flag
+    return f"{first_node.value}-{second_node.value}"
 
 def change_file(file: str) -> str:
     in_file = f"work_dir/{file}"
@@ -44,7 +48,7 @@ def change_file(file: str) -> str:
 
     schem = skip.Schematic(in_file)
 
-    changed_thing = choice([delete_wire, swap_labels, swap_labels, swap_labels])(schem)
+    changed_thing = choices((delete_wire, swap_labels, swap_label_no_connect), weights=(20, 50, 30), k=1)[0](schem)
 
     schem.write(in_file)
     shutil.copyfile(in_file, report_file)
