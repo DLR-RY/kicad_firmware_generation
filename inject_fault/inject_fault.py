@@ -20,7 +20,10 @@ def delete_wire(schem) -> str:
 def swap_labels(schem) -> str:
     if not hasattr(schem, "label"):
         return None
-    return f"swap_labels;{swap(schem.label, schem.label)}"
+    changed_thing = swap(schem.label, schem.label)
+    if changed_thing is None:
+        return None
+    return f"swap_labels;{changed_thing}"
 
 
 def swap_label_no_connect(schem) -> str:
@@ -28,7 +31,10 @@ def swap_label_no_connect(schem) -> str:
         return None
     if not hasattr(schem, "no_connect"):
         return None
-    return f"swap_label_no_connect;{swap(schem.no_connect, schem.label)}"
+    changed_thing = swap(schem.no_connect, schem.label)
+    if changed_thing is None:
+        return None
+    return f"swap_label_no_connect;{changed_thing}"
 
 
 def swap(first_group, second_group) -> str:
