@@ -5,6 +5,8 @@ import shutil
 
 
 def delete_wire(schem) -> str:
+    if len(schem.wire) == 0:
+        return "none"
     wire = choice(schem.wire)
     changed_thing = f"delete_wire;{wire.start.value}-{wire.end.value}"
     wire.delete()
@@ -12,6 +14,8 @@ def delete_wire(schem) -> str:
 
 
 def swap_labels(schem) -> str:
+    if len(schem.label) == 0:
+        return "none"
     first_label = choice(schem.label)
     neighbours = schem.label.within_reach_of(first_label, 20)
     if len(neighbours) == 0:
@@ -31,6 +35,7 @@ def swap_labels(schem) -> str:
     # Watch that some swapping is actually okay and shouldn't lead to an error.
     # E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
 
+# TODO: swap label with no connect flag
 
 def change_file(file: str) -> str:
     in_file = f"work_dir/{file}"
