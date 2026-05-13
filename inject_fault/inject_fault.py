@@ -5,7 +5,7 @@ import shutil
 
 
 def delete_wire(schem) -> str:
-    if schem.hasattr("wire"):
+    if hasattr(schem, "wire"):
         return None
     if len(schem.wire) == 0:
         return None
@@ -18,15 +18,15 @@ def delete_wire(schem) -> str:
 # Watch that some swapping is actually okay and shouldn't lead to an error.
 # E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
 def swap_labels(schem) -> str:
-    if schem.hasattr("label"):
+    if hasattr(schem, "label"):
         return None
     return f"swap_labels;{swap(schem.label, schem.label)}"
 
 
 def swap_label_no_connect(schem) -> str:
-    if schem.hasattr("label"):
+    if hasattr(schem, "label"):
         return None
-    if schem.hasattr("no_connect"):
+    if hasattr(schem, "no_connect"):
         return None
     return f"swap_label_no_connect;{swap(schem.no_connect, schem.label)}"
 
