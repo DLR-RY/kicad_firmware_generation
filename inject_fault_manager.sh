@@ -17,7 +17,7 @@ while true; do
     mkdir -v reports/${run_idx}
 
     echo changing a thing
-    changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx} || echo error;none)"
+    changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx} || echo 'error;none')"
     echo ${changed_thing}
 
     successfully_completed=0
