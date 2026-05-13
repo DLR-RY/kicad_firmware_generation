@@ -20,17 +20,18 @@ while true; do
     changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx})"
     echo ${changed_thing}
 
+    successfully_completed=0
     while read -r cmd; do
-        cmd_idx=$(ls -1 reports/${run_idx} | wc -l)
         pushd "work_dir"
-        if bash -c "${cmd}" 2>&1 | tee "../reports/${run_idx}/${cmd_idx}.txt"; then
+        if bash -c "${cmd}" 2>&1 | tee "../reports/${run_idx}/${successfully_completed}.txt"; then
             popd
         else
             popd
             break
         fi
+        successfully_completed=$((successfully_completed + 1))
     done < cmds.txt
 
-    echo "${run_idx},${changed_thing},$(ls -1 reports/${run_idx} | wc -l),$(cat cmds.txt | wc -l)" >> reports/central.csv
+    echo "${run_idx};${changed_thing};${successfully_completed};$(cat cmds.txt | wc -l)" >> reports/central.csv
     tail -n 1 reports/central.csv
 done
