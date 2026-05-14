@@ -72,8 +72,8 @@ def count_matches(schem, first_group_name, second_group_name) -> int:
 
 
 def count_all():
-    if pathlib.Path.exists(pathlib.Path("sch_files.json")):
-        with open("sch_files.json", "r") as f:
+    if pathlib.Path.exists(pathlib.Path("reports/sch_files.json")):
+        with open("reports/sch_files.json", "r") as f:
             return json.load(f)
 
     sch_files_json = {
@@ -109,7 +109,7 @@ def count_all():
                 continue
             sch_files_json["possible_faults"][key].append(count_matches(schem, keys[1], keys[2]))
 
-    with open("sch_files.json", "w") as file:
+    with open("reports/sch_files.json", "w") as file:
         json.dump(sch_files_json, file, indent=4)
     return sch_files_json
 
