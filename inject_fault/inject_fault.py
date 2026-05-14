@@ -19,6 +19,38 @@ def delete_wire(schem) -> str:
     return changed_thing
 
 
+def are_same_enough(stra: str, strb: str) -> bool:
+    if len(stra) != len(strb):
+        return False
+    diff_idxs = [i for i, (a, b) in enumerate(zip(stra, strb)) if a != b]
+    if len(diff_idxs) > 2:
+        return False
+    for diff_idx in diff_idxs:
+        if not stra[diff_idx].isdigit():
+            return False
+        if not strb[diff_idx].isdigit():
+            return False
+    return True
+
+
+def get_neighbours(first_node, second_group):
+    try:
+        neighbours = second_group.within_reach_of(first_node, NEIGHBOUR_DISTANCE)
+    except:
+        return []
+    filtered_neighbours = []
+    for second_node in neighbours:
+        # Don't swap with itself
+        if first_node.value == second_node.value:
+            continue
+        # Swapping labels like ADC8_CH2 and ADC7_CH1 don't actually create an error.
+        if are_same_enough(str(first_node.value), str(second_node.value)):
+            continue
+        filtered_neighbours.append(second_node)
+
+    return filtered_neighbours
+
+
 # Watch that some swapping is actually okay and shouldn't lead to an error.
 # E.g., using a different GPIO is fine; using a different ADC / ADC channel is fine; as long as everything is connected
 # Results could be greatly improved by adding simple checks to the Jinja2 template.
@@ -33,17 +65,14 @@ def swap(schem, first_group_name, second_group_name) -> str:
 
     if len(first_group) == 0:
         assert False
+    # We know that there must always be a first_node with at least one neighbour.
     while True:
         first_node = choice(first_group)
-        neighbours = second_group.within_reach_of(first_node, NEIGHBOUR_DISTANCE)
+        neighbours = get_neighbours(first_node, second_group)
         if len(neighbours) == 0:
             # don't do anything in this case
             continue
         second_node = choice(neighbours)
-
-        # Don't swap with itself
-        if first_node.value == second_node.value:
-            continue
         break
 
     # swap positions
@@ -63,12 +92,7 @@ def count_matches(schem, first_group_name, second_group_name) -> int:
     first_group = getattr(schem, first_group_name)
     second_group = getattr(schem, second_group_name)
 
-    def count_matches_for(first_node) -> int:
-        try:
-            return len(second_group.within_reach_of(first_node, NEIGHBOUR_DISTANCE))
-        except:
-            return 0
-    return sum([count_matches_for(first_node) for first_node in first_group])
+    return sum([len(get_neighbours(first_node, second_group)) for first_node in first_group])
 
 
 def count_all():
