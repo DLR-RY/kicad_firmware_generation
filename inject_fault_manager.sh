@@ -18,7 +18,7 @@ while true; do
 
     echo changing a thing
     changed_thing="$(python3 -m inject_fault.inject_fault ${run_idx} || echo ';error;none')"
-    echo ${changed_thing}
+    echo "${changed_thing}"
 
     successfully_completed=0
     while read -r cmd; do
