@@ -14,7 +14,7 @@ def delete_wire(schem) -> str:
     if len(schem.wire) == 0:
         assert False
     wire = choice(schem.wire)
-    changed_thing = f"delete_wire;{wire.start.value}-{wire.end.value}"
+    changed_thing = f"{wire.start.value}-{wire.end.value}"
     wire.delete()
     return changed_thing
 
