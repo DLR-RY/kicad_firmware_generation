@@ -22,7 +22,7 @@ def delete_wire(schem) -> str:
 def are_same_enough(stra: str, strb: str) -> bool:
     if len(stra) != len(strb):
         return False
-    return True
+    return stra == strb
     # Swapping labels like ADC8_CH2 and ADC7_CH1 don't actually create an error.
     # Actually, there are cases where this removes errors, like wrong GPIOs.
     diff_idxs = [i for i, (a, b) in enumerate(zip(stra, strb)) if a != b]
